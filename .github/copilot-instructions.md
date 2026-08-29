@@ -1,0 +1,5 @@
+- Verify the project structure and dependencies.
+- Keep the app focused on a modern French teacher portfolio.
+- Use Next.js + TypeScript with a clean, responsive layout.
+- Prefer clear, accessible components and consistent styling.
+- Validate with npm run build before finishing.
