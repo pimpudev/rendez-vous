@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Françoise Martin | Professeur de français",
-  description: "Site de cours de français personnalisés pour adultes, étudiants et professionnels.",
+  title: "Rendez-vous | Formations linguistiques",
+  description: "Site de formations linguistiques pour adultes, étudiants et professionnels.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
