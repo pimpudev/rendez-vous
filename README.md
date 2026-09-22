@@ -1,6 +1,6 @@
-# Françoise Martin | Professeur de français
+# Rendez-Vous
 
-Site vitrine pour un professeur de français, avec une landing page moderne, responsive et bilingue.
+Site vitrine pour des cours de français en ligne, avec une landing page moderne, responsive et bilingue.
 
 ## Démarrage
 
