@@ -8,11 +8,9 @@ type Language = "fr" | "en" | "es";
 
 const content = {
   fr: {
-    nav: ["Accueil", "Présentation", "Programmes", "Avis", "Contact"],
+    nav: ["Accueil", "Présentation", "Offres", "FAQ", "Avis", "Contact"],
     badge: "Formation de français • En ligne",
-    title: "Cours de français en ligne",
-    subtitle:
-      "Cours de français en ligne individuels ou collectifs pour adultes, étudiants et professionnels.\nPour découvrir ou approfondir la langue française, choisissez Rendez-vous, la plateforme de français en ligne qui s’adapte à vos besoins.",
+    subtitle: "Bienvenue sur notre plateforme de cours de français en ligne.\nDébutant ou expert, nous avons la formation qui correspond à vos objectifs.",
     primaryCta: "Réserver un cours",
     secondaryCta: "Découvrir la présentation",
     stats: [
@@ -35,7 +33,7 @@ const content = {
         text: "Des objectifs clairs, des exercices ciblés et un suivi régulier pour maintenir votre motivation.",
       },
     ],
-    programsTitle: "Programmes",
+    programsTitle: "Offres",
     programs: [
       { name: "A1/A2 – Débutant", text: "Apprendre les bases, prendre confiance et parler dès les premiers mois." },
       { name: "B1/B2 – Intermédiaire", text: "Améliorer votre fluidité, votre prononciation et votre expression spontanée." },
@@ -47,15 +45,20 @@ const content = {
       "La méthode m’a permis de progresser rapidement sans stress. Je pratique enfin le français naturellement.",
       "Très professionnelle, à l’écoute et exigeante dans le bon sens. J’ai vu une vraie progression en quelques mois.",
     ],
+    faqTitle: "FAQ",
+    faq: [
+      { question: "À qui s’adressent les cours ?", answer: "Les cours s’adressent aux adultes, étudiants et professionnels, quel que soit votre niveau." },
+      { question: "Les cours sont-ils individuels ?", answer: "Oui, les cours sont personnalisés pour respecter votre rythme et vos objectifs." },
+      { question: "Comment réserver un cours ?", answer: "Écrivez-moi pour échanger sur votre besoin et choisir le format qui vous convient." },
+    ],
     ctaTitle: "Prêt(e) à faire passer votre français au niveau supérieur ?",
     ctaText: "Rendez votre objectif accessible avec un accompagnement humain et personnalisé.",
     ctaButton: "Prendre rendez-vous",
     footer: "© 2026 Rendez-vous • Formations linguistiques",
   },
   en: {
-    nav: ["Home", "Presentation", "Programs", "Reviews", "Contact"],
+    nav: ["Home", "Presentation", "Offers", "FAQ", "Reviews", "Contact"],
     badge: "French training • Online",
-    title: "Online French courses",
     subtitle:
       "Individual or group online French courses for adults, students, and professionals.\nTo discover or deepen the French language, choose Rendez-vous, the online French platform that adapts to your needs.",
     primaryCta: "Book a lesson",
@@ -80,7 +83,7 @@ const content = {
         text: "Clear objectives, targeted exercises, and consistent follow-up keep motivation high.",
       },
     ],
-    programsTitle: "Programs",
+    programsTitle: "Offers",
     programs: [
       { name: "A1/A2 – Beginner", text: "Learn the basics, gain confidence, and start speaking from the first months." },
       { name: "B1/B2 – Intermediate", text: "Improve your fluency, pronunciation, and confidence in spontaneous discussion." },
@@ -92,15 +95,20 @@ const content = {
       "The method helped me improve quickly without stress. I finally speak French naturally.",
       "Very professional, attentive, and demanding in the best way. I saw real progress in just a few months.",
     ],
+    faqTitle: "FAQ",
+    faq: [
+      { question: "Who are the courses for?", answer: "The courses are for adults, students, and professionals at every level." },
+      { question: "Are the courses individual?", answer: "Yes, each course is personalized to your pace and goals." },
+      { question: "How do I book a lesson?", answer: "Send me a message to discuss your needs and choose the right format." },
+    ],
     ctaTitle: "Ready to move your French to the next level?",
     ctaText: "Turn your goal into a clear plan with human, personalized support.",
     ctaButton: "Schedule a session",
     footer: "© 2026 Rendez-vous • Language training",
   },
   es: {
-    nav: ["Inicio", "Presentación", "Programas", "Opiniones", "Contacto"],
+    nav: ["Inicio", "Presentación", "Ofertas", "FAQ", "Opiniones", "Contacto"],
     badge: "Formación de francés • En línea",
-    title: "Cursos de francés en línea",
     subtitle:
       "Cursos de francés en línea individuales o grupales para adultos, estudiantes y profesionales.\nPara descubrir o perfeccionar el francés, elige Rendez-vous, la plataforma en línea que se adapta a tus necesidades.",
     primaryCta: "Reservar una clase",
@@ -116,7 +124,7 @@ const content = {
       { title: "Conversación activa", text: "Priorizo la práctica oral para que hables francés con más fluidez y confianza." },
       { title: "Progreso concreto", text: "Objetivos claros, ejercicios específicos y seguimiento regular para mantener tu motivación." },
     ],
-    programsTitle: "Programas",
+    programsTitle: "Ofertas",
     programs: [
       { name: "A1/A2 – Principiante", text: "Aprende las bases, gana confianza y empieza a hablar desde los primeros meses." },
       { name: "B1/B2 – Intermedio", text: "Mejora tu fluidez, pronunciación y expresión espontánea." },
@@ -127,6 +135,12 @@ const content = {
       "He recuperado la confianza para hablar en el trabajo. Las clases son claras, motivadoras y muy bien estructuradas.",
       "El método me permitió progresar rápidamente y sin estrés. Por fin practico francés de forma natural.",
       "Muy profesional, atenta y exigente en el buen sentido. Vi un progreso real en pocos meses.",
+    ],
+    faqTitle: "FAQ",
+    faq: [
+      { question: "¿A quién van dirigidos los cursos?", answer: "Los cursos están dirigidos a adultos, estudiantes y profesionales de cualquier nivel." },
+      { question: "¿Son clases individuales?", answer: "Sí, cada clase se personaliza según tu ritmo y tus objetivos." },
+      { question: "¿Cómo reservar una clase?", answer: "Escríbeme para hablar de tus necesidades y elegir el formato adecuado." },
     ],
     ctaTitle: "¿Listo para llevar tu francés al siguiente nivel?",
     ctaText: "Haz que tu objetivo sea alcanzable con un acompañamiento humano y personalizado.",
@@ -149,7 +163,7 @@ export default function Home() {
           </div>
           <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-5 font-sans text-sm font-bold text-slate-900 md:flex">
             {t.nav.map((item) => (
-              item === (lang === "fr" ? "Programmes" : lang === "en" ? "Programs" : "Programas") ? (
+              item === (lang === "fr" ? "Offres" : lang === "en" ? "Offers" : "Ofertas") ? (
                 <div key={item} className="relative">
                   <button
                     type="button"
@@ -175,7 +189,7 @@ export default function Home() {
                   )}
                 </div>
               ) : (
-                <a key={item} href="#" className="transition hover:text-slate-900">
+                <a key={item} href={item === "FAQ" ? "#faq" : "#"} className="transition hover:text-slate-900">
                   {item}
                 </a>
               )
@@ -214,11 +228,16 @@ export default function Home() {
               </span>
               <h1 className="mt-6 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
                 <span className="block text-red-600">Rendez-vous</span>
-                <span className="mt-2 block">{t.title}</span>
               </h1>
               <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600 lg:text-left" style={{ whiteSpace: "pre-line" }}>
-              {t.subtitle}
-            </p>
+                {t.subtitle}
+                {lang === "fr" && (
+                  <>
+                    <br />
+                    Consultez les <Link href="#programs" className="font-bold text-red-600 underline decoration-red-300 underline-offset-4 hover:text-red-700">OFFRES</Link> pour en savoir plus.
+                  </>
+                )}
+              </p>
 
               <div className="mt-8 flex flex-wrap justify-center gap-4 lg:justify-start">
                 <button className="rounded-full bg-red-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-red-200 transition hover:bg-red-500">
@@ -240,21 +259,14 @@ export default function Home() {
             </div>
 
             <div className="flex justify-center lg:justify-end">
-              <div className="w-full max-w-[380px] overflow-hidden rounded-[1.5rem] border border-sky-200 bg-white/60 shadow-[0_20px_60px_rgba(14,64,97,0.08)]">
-                <div className="relative aspect-video w-full bg-[linear-gradient(135deg,_#dfeef8_0%,_#cfe0ef_35%,_#b9d4eb_100%)]">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.35),_transparent_55%)]" />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="flex h-18 w-18 items-center justify-center rounded-full bg-white/80 shadow-lg backdrop-blur-sm">
-                      <div className="ml-1 h-0 w-0 border-y-[10px] border-l-[18px] border-y-transparent border-l-sky-700" />
-                    </div>
+              <div className="flex min-h-[280px] w-full max-w-[380px] items-center justify-center">
+                <div className="text-center">
+                  <div className="mx-auto flex items-center justify-center">
+                    <span className="flex h-24 w-24 items-center justify-center rounded-full bg-red-600 text-4xl font-black text-white shadow-lg shadow-red-200">R</span>
+                    <span className="-ml-5 mt-8 flex h-20 w-20 items-center justify-center rounded-full border-4 border-[#EAF3F8] bg-slate-900 text-3xl font-black text-white">V</span>
                   </div>
-                  <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between rounded-full border border-white/60 bg-white/50 px-3 py-2 text-left backdrop-blur-sm">
-                    <div>
-                      <p className="text-[8px] font-semibold uppercase tracking-[0.2em] text-sky-700">{t.nav[1]}</p>
-                      <p className="text-[11px] font-medium text-slate-700">{t.secondaryCta}</p>
-                    </div>
-                    <span className="rounded-full bg-sky-700 px-2 py-1 text-[8px] font-semibold uppercase tracking-[0.2em] text-white">Video</span>
-                  </div>
+                  <p className="mt-6 text-4xl font-black tracking-tight text-slate-900">Rendez-vous</p>
+                  <p className="mt-2 text-xs font-bold uppercase tracking-[0.2em] text-red-600">{t.badge}</p>
                 </div>
               </div>
             </div>
@@ -302,6 +314,23 @@ export default function Home() {
                 <p className="mt-4 text-lg leading-8 text-slate-600">{program.text}</p>
               </Link>
             ))}
+          </div>
+        </section>
+
+        <section id="faq" className="bg-white py-20">
+          <div className="mx-auto max-w-4xl px-6 lg:px-8">
+            <div className="mx-auto max-w-2xl text-center">
+              <h2 className="text-3xl font-black tracking-tight text-slate-900 sm:text-5xl">{t.faqTitle}</h2>
+            </div>
+
+            <div className="mt-12 space-y-4">
+              {t.faq.map((item) => (
+                <details key={item.question} className="rounded-2xl border border-slate-200 bg-slate-50 p-5 shadow-sm">
+                  <summary className="cursor-pointer font-semibold text-slate-900">{item.question}</summary>
+                  <p className="mt-3 leading-7 text-slate-600">{item.answer}</p>
+                </details>
+              ))}
+            </div>
           </div>
         </section>
 
