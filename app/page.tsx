@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import ThemeToggle from "./theme-toggle";
 
 type Language = "fr" | "en" | "es";
 
@@ -140,10 +141,13 @@ export default function Home() {
   const t = content[lang];
 
   return (
-    <div className="min-h-screen bg-[linear-gradient(180deg,_#EAF3F8_0%,_#DDECF5_35%,_#C9DDEA_68%,_#B6CCE1_100%)] text-slate-800">
+    <div className="site-shell min-h-screen bg-[linear-gradient(180deg,_#EAF3F8_0%,_#DDECF5_35%,_#C9DDEA_68%,_#B6CCE1_100%)] text-slate-800">
       <header className="mx-auto max-w-6xl px-6 py-6 lg:px-8">
         <div className="relative flex items-center justify-end rounded-full bg-white px-4 py-3 shadow-sm">
-          <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-8 font-sans text-sm font-bold text-slate-900 md:flex">
+          <div className="absolute left-4 top-1/2 z-10 -translate-y-1/2">
+            <ThemeToggle />
+          </div>
+          <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-5 font-sans text-sm font-bold text-slate-900 md:flex">
             {t.nav.map((item) => (
               item === (lang === "fr" ? "Programmes" : lang === "en" ? "Programs" : "Programas") ? (
                 <div key={item} className="relative">
