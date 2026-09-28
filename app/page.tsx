@@ -8,7 +8,7 @@ type Language = "fr" | "en" | "es";
 
 const content = {
   fr: {
-    nav: ["Présentation", "Offres", "FAQ", "Avis", "Contact"],
+    nav: ["Présentation", "Cours", "FAQ", "Avis", "Contact"],
     badge: "Formation de français • En ligne",
     subtitle: "Bienvenue sur notre plateforme de cours de français en ligne.\nDébutant ou expert, nous avons la formation qui correspond à vos objectifs.",
     primaryCta: "Réserver un cours",
@@ -21,7 +21,7 @@ const content = {
     teacherName: "Benjamin Bruneau",
     teacherRole: "Directeur",
     teacherBio: [
-      "Linguiste et pédagogue, Benjamin a étudié la linguistique (Master 2 sciences du langage – Université Paris V) et la didactique du français langue étrangère (Master 2 Didactique du FLE – Université de Dijon).",
+      "Linguiste et pédagogue, Benjamin Bruneau a étudié la linguistique (Master 2 sciences du langage – Université Paris V) et la didactique du français langue étrangère (Master 2 Didactique du FLE – Université de Dijon).",
       "Depuis 2017, il a travaillé dans des Alliances françaises en France, en Inde et en Ukraine.",
       "Depuis 2026, il anime le podcast Voix-Liées.",
       "En 2027, il fonde la plateforme Rendez-Vous pour offrir un accompagnement plus personnalisé aux francophones du monde entier.",
@@ -39,7 +39,7 @@ const content = {
     methodOfferStart: "Selon votre objectif, votre disponibilité et votre budget, choisissez ",
     methodOffer: "l’offre",
     methodOfferEnd: " qui vous correspond.",
-    programsTitle: "Offres",
+    programsTitle: "Cours",
     offerBlocks: [
       {
         title: "INDIVIDUEL",
@@ -80,7 +80,7 @@ const content = {
     footer: "© 2026 Rendez-vous • Formations linguistiques",
   },
   en: {
-    nav: ["Presentation", "Offers", "FAQ", "Reviews", "Contact"],
+    nav: ["Presentation", "Courses", "FAQ", "Reviews", "Contact"],
     badge: "French training • Online",
     subtitle:
       "Individual or group online French courses for adults, students, and professionals.\nTo discover or deepen the French language, choose Rendez-vous, the online French platform that adapts to your needs.",
@@ -94,7 +94,7 @@ const content = {
     teacherName: "Benjamin Bruneau",
     teacherRole: "Director",
     teacherBio: [
-      "A linguist and educator, Benjamin studied linguistics (Master 2 in Language Sciences – Paris V University) and French as a Foreign Language teaching (Master 2 in FFL Didactics – University of Dijon).",
+      "A linguist and educator, Benjamin Bruneau studied linguistics (Master 2 in Language Sciences – Paris V University) and French as a Foreign Language teaching (Master 2 in FFL Didactics – University of Dijon).",
       "Since 2017, he has worked with Alliance Française locations in France, India, and Ukraine.",
       "Since 2026, he hosts the Voix-Liées podcast.",
       "In 2027, he will found the Rendez-Vous platform to offer more personalized support to French speakers around the world.",
@@ -112,7 +112,7 @@ const content = {
     methodOfferStart: "Depending on your goals, availability, and budget, choose ",
     methodOffer: "the offer",
     methodOfferEnd: " that suits you.",
-    programsTitle: "Offers",
+    programsTitle: "Courses",
     offerBlocks: [
       {
         title: "INDIVIDUAL",
@@ -153,7 +153,7 @@ const content = {
     footer: "© 2026 Rendez-vous • Language training",
   },
   es: {
-    nav: ["Presentación", "Ofertas", "FAQ", "Opiniones", "Contacto"],
+    nav: ["Presentación", "Cursos", "FAQ", "Opiniones", "Contacto"],
     badge: "Formación de francés • En línea",
     subtitle:
       "Cursos de francés en línea individuales o grupales para adultos, estudiantes y profesionales.\nPara descubrir o perfeccionar el francés, elige Rendez-vous, la plataforma en línea que se adapta a tus necesidades.",
@@ -167,7 +167,7 @@ const content = {
     teacherName: "Benjamin Bruneau",
     teacherRole: "Director",
     teacherBio: [
-      "Lingüista y pedagogo, Benjamin estudió lingüística (Máster 2 en Ciencias del Lenguaje – Universidad Paris V) y la enseñanza del francés como lengua extranjera (Máster 2 en Didáctica del FLE – Universidad de Dijon).",
+      "Lingüista y pedagogo, Benjamin Bruneau estudió lingüística (Máster 2 en Ciencias del Lenguaje – Universidad Paris V) y la enseñanza del francés como lengua extranjera (Máster 2 en Didáctica del FLE – Universidad de Dijon).",
       "Desde 2017, ha trabajado en sedes de la Alliance Française en Francia, India y Ucrania.",
       "Desde 2026, presenta el pódcast Voix-Liées.",
       "En 2027, fundará la plataforma Rendez-Vous para ofrecer un acompañamiento más personalizado a los francófonos de todo el mundo.",
@@ -185,7 +185,7 @@ const content = {
     methodOfferStart: "Según tus objetivos, disponibilidad y presupuesto, elige ",
     methodOffer: "la oferta",
     methodOfferEnd: " que mejor se adapte a ti.",
-    programsTitle: "Ofertas",
+    programsTitle: "Cursos",
     offerBlocks: [
       {
         title: "INDIVIDUAL",
@@ -226,6 +226,35 @@ const content = {
     footer: "© 2026 Rendez-vous • Formación lingüística",
   },
 } as const;
+
+function emphasizeProjectName(text: string) {
+  return text.split(/(rendez-vous)/gi).map((part, index) =>
+    /^rendez-vous$/i.test(part) ? <strong key={index}>{part}</strong> : part,
+  );
+}
+
+function renderTeacherBio(text: string, teacherName: string) {
+  const phrasesToItalicize = [
+    teacherName,
+    "Université Paris V",
+    "Université de Dijon",
+    "Paris V University",
+    "University of Dijon",
+    "Universidad Paris V",
+    "Universidad de Dijon",
+  ].filter((phrase) => text.toLowerCase().includes(phrase.toLowerCase()));
+
+  if (phrasesToItalicize.length === 0) return emphasizeProjectName(text);
+
+  const escapeRegExp = (phrase: string) => phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const phrasePattern = new RegExp(`(${phrasesToItalicize.map(escapeRegExp).join("|")})`, "gi");
+
+  return text.split(phrasePattern).map((part, index) =>
+    phrasesToItalicize.some((phrase) => phrase.toLowerCase() === part.toLowerCase())
+      ? <em key={index}>{part}</em>
+      : emphasizeProjectName(part),
+  );
+}
 
 export default function Home() {
   const [lang, setLang] = useState<Language>("fr");
@@ -297,7 +326,7 @@ export default function Home() {
                 <span className="block text-red-600">Rendez-vous</span>
               </h1>
               <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600 lg:text-left" style={{ whiteSpace: "pre-line" }}>
-                {t.subtitle}
+                {emphasizeProjectName(t.subtitle)}
                 {lang === "fr" && (
                   <>
                     <br />
@@ -354,7 +383,7 @@ export default function Home() {
                   <p className="mt-1 text-sm font-bold uppercase tracking-[0.14em] text-red-600">{t.teacherRole}</p>
                   <div className="mt-4 space-y-3 text-base leading-7 text-slate-600">
                     {t.teacherBio.map((paragraph) => (
-                      <p key={paragraph}>{paragraph}</p>
+                      <p key={paragraph}>{renderTeacherBio(paragraph, t.teacherName)}</p>
                     ))}
                   </div>
                 </div>
@@ -369,7 +398,7 @@ export default function Home() {
               <h3 className="text-2xl font-bold text-slate-900">{t.methodTitle}</h3>
               <div className="mx-auto mt-8 grid max-w-none gap-x-12 gap-y-2 text-left md:grid-cols-2">
                 {t.methodParagraphs.map((paragraph) => (
-                  <p key={paragraph} className="text-base leading-7 text-slate-600">{paragraph}</p>
+                  <p key={paragraph} className="text-base leading-7 text-slate-600">{emphasizeProjectName(paragraph)}</p>
                 ))}
                 <p className="text-base leading-7 text-slate-600">
                   {t.methodOfferStart}
@@ -460,7 +489,7 @@ export default function Home() {
 
       <footer id="contact" className="border-t border-slate-200 bg-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-8 text-sm text-slate-500 lg:px-8">
-          <p>{t.footer}</p>
+          <p>{emphasizeProjectName(t.footer)}</p>
           <p>bonjour@rendez-vous.fr</p>
         </div>
       </footer>
