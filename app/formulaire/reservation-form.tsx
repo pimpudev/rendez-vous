@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
+import { getSupabaseClient } from "../../lib/supabase";
 
 type ChoiceGroupProps = {
   label: string;
@@ -35,12 +36,62 @@ function ChoiceGroup({ label, name, options }: ChoiceGroupProps) {
 
 export default function ReservationForm({ selectedOffer }: { selectedOffer: string }) {
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!event.currentTarget.reportValidity()) return;
-    setSubmitted(true);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    const form = event.currentTarget;
+    if (!form.reportValidity()) return;
+
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+      setErrorMessage("Le formulaire n’est pas connecté à la base de données. Réessayez plus tard.");
+      return;
+    }
+
+    const formData = new FormData(form);
+    const text = (name: string) => String(formData.get(name) ?? "").trim();
+    const choices = (name: string) => formData.getAll(name).map(String);
+
+    setIsSubmitting(true);
+    setErrorMessage("");
+
+    try {
+      const { error } = await supabase.from("reservations").insert({
+        first_name: text("prenom"),
+        last_name: text("nom"),
+        age: Number(text("age")),
+        email: text("email"),
+        french_levels: choices("niveau[]"),
+        professional_status: choices("situation[]"),
+        enrolled_in_school: choices("inscription[]").includes("Oui"),
+        interests: text("interet"),
+        discovery_sources: choices("decouverte[]"),
+        desired_duration: choices("inscriptionDuree[]"),
+        weekly_hours: choices("heuresParSemaine[]"),
+        availability_periods: choices("moments[]"),
+        available_immediately: choices("disponibiliteDate[]").includes("dès que possible"),
+        available_from: text("dateDebut") || null,
+        available_until: text("dateFin") || null,
+        no_deadline: choices("disponibiliteDate[]").includes("pas de date limite"),
+        payment_methods: choices("paiement[]"),
+        comment: text("commentaire"),
+        offer: text("offre"),
+      });
+
+      if (error) {
+        setErrorMessage("L’envoi a échoué. Vérifiez votre connexion puis réessayez.");
+        return;
+      }
+
+      setSubmitted(true);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch {
+      setErrorMessage("L’envoi a échoué. Vérifiez votre connexion puis réessayez.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   if (submitted) {
@@ -170,8 +221,9 @@ export default function ReservationForm({ selectedOffer }: { selectedOffer: stri
       </label>
 
       <div className="border-t border-slate-200 py-6 text-center">
-        <button type="submit" className="inline-flex min-h-14 items-center justify-center rounded-full bg-red-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-red-200 transition hover:bg-red-500">
-          Envoyer le formulaire
+        {errorMessage && <p role="alert" className="mb-4 text-sm font-semibold text-red-700">{errorMessage}</p>}
+        <button type="submit" disabled={isSubmitting} className="inline-flex min-h-14 items-center justify-center rounded-full bg-red-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-red-200 transition hover:bg-red-500 disabled:cursor-wait disabled:opacity-60">
+          {isSubmitting ? "Envoi en cours…" : "Envoyer le formulaire"}
         </button>
       </div>
     </form>

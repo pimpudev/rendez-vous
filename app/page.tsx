@@ -488,9 +488,14 @@ export default function Home() {
       </main>
 
       <footer id="contact" className="border-t border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-8 text-sm text-slate-500 lg:px-8">
+        <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-3 px-6 py-8 text-sm text-slate-500 sm:grid-cols-3 lg:px-8">
+          <Link href="/admin" className="justify-self-start font-semibold transition hover:text-red-600">
+            Admin
+          </Link>
           <p>{emphasizeProjectName(t.footer)}</p>
-          <p>bonjour@rendez-vous.fr</p>
+          <a href="mailto:bonjour@rendez-vous.fr" className="justify-self-start transition hover:text-red-600 sm:justify-self-end">
+            bonjour@rendez-vous.fr
+          </a>
         </div>
       </footer>
     </div>
