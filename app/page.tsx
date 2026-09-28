@@ -8,7 +8,7 @@ type Language = "fr" | "en" | "es";
 
 const content = {
   fr: {
-    nav: ["Accueil", "Présentation", "Offres", "FAQ", "Avis", "Contact"],
+    nav: ["Présentation", "Offres", "FAQ", "Avis", "Contact"],
     badge: "Formation de français • En ligne",
     subtitle: "Bienvenue sur notre plateforme de cours de français en ligne.\nDébutant ou expert, nous avons la formation qui correspond à vos objectifs.",
     primaryCta: "Réserver un cours",
@@ -18,26 +18,49 @@ const content = {
       { value: "500+", label: "élèves accompagnés" },
       { value: "92%", label: "de satisfaction" },
     ],
-    highlightsTitle: "Pourquoi choisir ma méthode ?",
-    highlights: [
-      {
-        title: "Approche personnalisée",
-        text: "Chaque cours est construit selon votre niveau, votre rythme et vos objectifs professionnels ou personnels.",
-      },
-      {
-        title: "Conversation active",
-        text: "Je mets l’accent sur la pratique orale pour vous rendre plus fluide et plus sûr(e) en français.",
-      },
-      {
-        title: "Progression concrète",
-        text: "Des objectifs clairs, des exercices ciblés et un suivi régulier pour maintenir votre motivation.",
-      },
+    teacherName: "Benjamin Bruneau",
+    teacherRole: "Directeur",
+    teacherBio: [
+      "Linguiste et pédagogue, Benjamin a étudié la linguistique (Master 2 sciences du langage – Université Paris V) et la didactique du français langue étrangère (Master 2 Didactique du FLE – Université de Dijon).",
+      "Depuis 2017, il a travaillé dans des Alliances françaises en France, en Inde et en Ukraine.",
+      "Depuis 2026, il anime le podcast Voix-Liées.",
+      "En 2027, il fonde la plateforme Rendez-Vous pour offrir un accompagnement plus personnalisé aux francophones du monde entier.",
     ],
+    videoPlaceholder: "Vidéo de présentation",
+    photoPlaceholder: "Photo du professeur",
+    methodTitle: "Méthode",
+    methodParagraphs: [
+      "Rendez-Vous met à disposition de ses étudiants toutes les ressources nécessaires (pdf, audios, vidéos, manuels scolaires, films, etc).",
+      "Les cours sont assurés via Zoom et les documents disponibles sur Drive.",
+      "Afin de garantir un accompagnement personnalisé, les groupes ne dépassent jamais 10 étudiants.",
+      "Bien que Rendez-Vous privilégie la communication interactive et les documents authentiques dans une ambiance conviviale, nous ajustons notre méthode à chaque étudiant, chaque groupe et chaque objectif.",
+      "La meilleure méthode qui existe...est celle qui marche.",
+    ],
+    methodOfferStart: "Selon votre objectif, votre disponibilité et votre budget, choisissez ",
+    methodOffer: "l’offre",
+    methodOfferEnd: " qui vous correspond.",
     programsTitle: "Offres",
-    programs: [
-      { name: "A1/A2 – Débutant", text: "Apprendre les bases, prendre confiance et parler dès les premiers mois." },
-      { name: "B1/B2 – Intermédiaire", text: "Améliorer votre fluidité, votre prononciation et votre expression spontanée." },
-      { name: "C1/C2 – Avancé", text: "Mieux communiquer en français pour les entretiens, réunions et présentations." },
+    offerBlocks: [
+      {
+        title: "INDIVIDUEL",
+        notes: [],
+        items: [
+          { slug: "individuel-professionnel", name: "Professionnel – 1 à 4 compétences", price: "3000 roupies = 30 euros / heure" },
+          { slug: "individuel-delf-dalf", name: "DELF DALF – 4 compétences", price: "2500 roupies = 25 euros / heure" },
+          { slug: "individuel-cours-libre", name: "Cours libre – 3 compétences", price: "2500 roupies = 25 euros / heure" },
+          { slug: "individuel-conversation", name: "Conversation – 2 compétences", price: "2000 roupies = 20 euros / heure" },
+        ],
+      },
+      {
+        title: "GROUPE",
+        notes: ["Minimum 4 étudiants / Maximum 10 étudiants", "Minimum 10 heures"],
+        items: [
+          { slug: "groupe-delf-a1-a2-b1", name: "DELF A1-A2-B1 – 4 compétences", price: "1000 roupies = 10 euros / heure / étudiant" },
+          { slug: "groupe-delf-b2-dalf-c1-c2", name: "DELF B2 - DALF C1-C2 – 4 compétences", price: "1500 roupies = 15 euros / heure / étudiant" },
+          { slug: "groupe-cours-libre", name: "Cours libre – 3 compétences", price: "1000 roupies = 10 euros / heure / étudiant" },
+          { slug: "groupe-conversation", name: "Conversation – 2 compétences", price: "800 roupies = 8 euros / heure / étudiant" },
+        ],
+      },
     ],
     testimonialsTitle: "Avis",
     testimonials: [
@@ -57,7 +80,7 @@ const content = {
     footer: "© 2026 Rendez-vous • Formations linguistiques",
   },
   en: {
-    nav: ["Home", "Presentation", "Offers", "FAQ", "Reviews", "Contact"],
+    nav: ["Presentation", "Offers", "FAQ", "Reviews", "Contact"],
     badge: "French training • Online",
     subtitle:
       "Individual or group online French courses for adults, students, and professionals.\nTo discover or deepen the French language, choose Rendez-vous, the online French platform that adapts to your needs.",
@@ -68,26 +91,49 @@ const content = {
       { value: "500+", label: "students guided" },
       { value: "92%", label: "satisfaction rate" },
     ],
-    highlightsTitle: "Why choose my method?",
-    highlights: [
-      {
-        title: "Personalized approach",
-        text: "Each course is adapted to your level, pace, and personal or professional goals.",
-      },
-      {
-        title: "Active speaking",
-        text: "I prioritize oral communication so you become more fluent and confident in French.",
-      },
-      {
-        title: "Real progress",
-        text: "Clear objectives, targeted exercises, and consistent follow-up keep motivation high.",
-      },
+    teacherName: "Benjamin Bruneau",
+    teacherRole: "Director",
+    teacherBio: [
+      "A linguist and educator, Benjamin studied linguistics (Master 2 in Language Sciences – Paris V University) and French as a Foreign Language teaching (Master 2 in FFL Didactics – University of Dijon).",
+      "Since 2017, he has worked with Alliance Française locations in France, India, and Ukraine.",
+      "Since 2026, he hosts the Voix-Liées podcast.",
+      "In 2027, he will found the Rendez-Vous platform to offer more personalized support to French speakers around the world.",
     ],
+    videoPlaceholder: "Presentation video",
+    photoPlaceholder: "Teacher photo",
+    methodTitle: "The method",
+    methodParagraphs: [
+      "Rendez-Vous provides students with all the resources they need (PDFs, audio, videos, textbooks, films, etc.).",
+      "Lessons take place on Zoom, and materials are available on Drive.",
+      "To ensure personalized support, groups never exceed 10 students.",
+      "While Rendez-Vous favors interactive communication and authentic materials in a friendly atmosphere, we adapt our method to every student, group, and goal.",
+      "The best method there is... is the one that works.",
+    ],
+    methodOfferStart: "Depending on your goals, availability, and budget, choose ",
+    methodOffer: "the offer",
+    methodOfferEnd: " that suits you.",
     programsTitle: "Offers",
-    programs: [
-      { name: "A1/A2 – Beginner", text: "Learn the basics, gain confidence, and start speaking from the first months." },
-      { name: "B1/B2 – Intermediate", text: "Improve your fluency, pronunciation, and confidence in spontaneous discussion." },
-      { name: "C1/C2 – Advanced", text: "Communicate more effectively in French for meetings, interviews, and presentations." },
+    offerBlocks: [
+      {
+        title: "INDIVIDUAL",
+        notes: [],
+        items: [
+          { slug: "individuel-professionnel", name: "Professional – 1 to 4 skills", price: "3,000 rupees = 30 euros / hour" },
+          { slug: "individuel-delf-dalf", name: "DELF DALF – 4 skills", price: "2,500 rupees = 25 euros / hour" },
+          { slug: "individuel-cours-libre", name: "Open course – 3 skills", price: "2,500 rupees = 25 euros / hour" },
+          { slug: "individuel-conversation", name: "Conversation – 2 skills", price: "2,000 rupees = 20 euros / hour" },
+        ],
+      },
+      {
+        title: "GROUP",
+        notes: ["Minimum 4 students / Maximum 10 students", "Minimum 10 hours"],
+        items: [
+          { slug: "groupe-delf-a1-a2-b1", name: "DELF A1-A2-B1 – 4 skills", price: "1,000 rupees = 10 euros / hour / student" },
+          { slug: "groupe-delf-b2-dalf-c1-c2", name: "DELF B2 - DALF C1-C2 – 4 skills", price: "1,500 rupees = 15 euros / hour / student" },
+          { slug: "groupe-cours-libre", name: "Open course – 3 skills", price: "1,000 rupees = 10 euros / hour / student" },
+          { slug: "groupe-conversation", name: "Conversation – 2 skills", price: "800 rupees = 8 euros / hour / student" },
+        ],
+      },
     ],
     testimonialsTitle: "Reviews",
     testimonials: [
@@ -107,7 +153,7 @@ const content = {
     footer: "© 2026 Rendez-vous • Language training",
   },
   es: {
-    nav: ["Inicio", "Presentación", "Ofertas", "FAQ", "Opiniones", "Contacto"],
+    nav: ["Presentación", "Ofertas", "FAQ", "Opiniones", "Contacto"],
     badge: "Formación de francés • En línea",
     subtitle:
       "Cursos de francés en línea individuales o grupales para adultos, estudiantes y profesionales.\nPara descubrir o perfeccionar el francés, elige Rendez-vous, la plataforma en línea que se adapta a tus necesidades.",
@@ -118,17 +164,49 @@ const content = {
       { value: "500+", label: "alumnos acompañados" },
       { value: "92%", label: "de satisfacción" },
     ],
-    highlightsTitle: "¿Por qué elegir mi método?",
-    highlights: [
-      { title: "Enfoque personalizado", text: "Cada clase se adapta a tu nivel, ritmo y objetivos personales o profesionales." },
-      { title: "Conversación activa", text: "Priorizo la práctica oral para que hables francés con más fluidez y confianza." },
-      { title: "Progreso concreto", text: "Objetivos claros, ejercicios específicos y seguimiento regular para mantener tu motivación." },
+    teacherName: "Benjamin Bruneau",
+    teacherRole: "Director",
+    teacherBio: [
+      "Lingüista y pedagogo, Benjamin estudió lingüística (Máster 2 en Ciencias del Lenguaje – Universidad Paris V) y la enseñanza del francés como lengua extranjera (Máster 2 en Didáctica del FLE – Universidad de Dijon).",
+      "Desde 2017, ha trabajado en sedes de la Alliance Française en Francia, India y Ucrania.",
+      "Desde 2026, presenta el pódcast Voix-Liées.",
+      "En 2027, fundará la plataforma Rendez-Vous para ofrecer un acompañamiento más personalizado a los francófonos de todo el mundo.",
     ],
+    videoPlaceholder: "Vídeo de presentación",
+    photoPlaceholder: "Foto del profesor",
+    methodTitle: "El método",
+    methodParagraphs: [
+      "Rendez-Vous pone a disposición de sus estudiantes todos los recursos necesarios (PDF, audios, vídeos, manuales, películas, etc.).",
+      "Las clases se imparten por Zoom y los documentos están disponibles en Drive.",
+      "Para garantizar un acompañamiento personalizado, los grupos nunca superan los 10 estudiantes.",
+      "Aunque Rendez-Vous prioriza la comunicación interactiva y los documentos auténticos en un ambiente agradable, adaptamos nuestro método a cada estudiante, grupo y objetivo.",
+      "El mejor método que existe... es el que funciona.",
+    ],
+    methodOfferStart: "Según tus objetivos, disponibilidad y presupuesto, elige ",
+    methodOffer: "la oferta",
+    methodOfferEnd: " que mejor se adapte a ti.",
     programsTitle: "Ofertas",
-    programs: [
-      { name: "A1/A2 – Principiante", text: "Aprende las bases, gana confianza y empieza a hablar desde los primeros meses." },
-      { name: "B1/B2 – Intermedio", text: "Mejora tu fluidez, pronunciación y expresión espontánea." },
-      { name: "C1/C2 – Avanzado", text: "Comunícate mejor en francés para entrevistas, reuniones y presentaciones." },
+    offerBlocks: [
+      {
+        title: "INDIVIDUAL",
+        notes: [],
+        items: [
+          { slug: "individuel-professionnel", name: "Profesional – 1 a 4 competencias", price: "3000 rupias = 30 euros / hora" },
+          { slug: "individuel-delf-dalf", name: "DELF DALF – 4 competencias", price: "2500 rupias = 25 euros / hora" },
+          { slug: "individuel-cours-libre", name: "Curso libre – 3 competencias", price: "2500 rupias = 25 euros / hora" },
+          { slug: "individuel-conversation", name: "Conversación – 2 competencias", price: "2000 rupias = 20 euros / hora" },
+        ],
+      },
+      {
+        title: "GRUPO",
+        notes: ["Mínimo 4 estudiantes / Máximo 10 estudiantes", "Mínimo 10 horas"],
+        items: [
+          { slug: "groupe-delf-a1-a2-b1", name: "DELF A1-A2-B1 – 4 competencias", price: "1000 rupias = 10 euros / hora / estudiante" },
+          { slug: "groupe-delf-b2-dalf-c1-c2", name: "DELF B2 - DALF C1-C2 – 4 competencias", price: "1500 rupias = 15 euros / hora / estudiante" },
+          { slug: "groupe-cours-libre", name: "Curso libre – 3 competencias", price: "1000 rupias = 10 euros / hora / estudiante" },
+          { slug: "groupe-conversation", name: "Conversación – 2 competencias", price: "800 rupias = 8 euros / hora / estudiante" },
+        ],
+      },
     ],
     testimonialsTitle: "Opiniones",
     testimonials: [
@@ -151,48 +229,37 @@ const content = {
 
 export default function Home() {
   const [lang, setLang] = useState<Language>("fr");
-  const [programsOpen, setProgramsOpen] = useState(false);
   const t = content[lang];
 
   return (
     <div className="site-shell min-h-screen bg-[linear-gradient(180deg,_#EAF3F8_0%,_#DDECF5_35%,_#C9DDEA_68%,_#B6CCE1_100%)] text-slate-800">
       <header className="mx-auto max-w-6xl px-6 py-6 lg:px-8">
         <div className="relative flex items-center justify-end rounded-full bg-white px-4 py-3 shadow-sm">
-          <div className="absolute left-4 top-1/2 z-10 -translate-y-1/2">
-            <ThemeToggle />
+          <div className="absolute left-5 top-1/2 z-10 flex -translate-y-1/2 items-center gap-3">
+            <Link href="/" className="font-bold text-slate-900 transition hover:text-red-600">
+              Rendez-vous
+            </Link>
+            <ThemeToggle language={lang} />
           </div>
           <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-5 font-sans text-sm font-bold text-slate-900 md:flex">
             {t.nav.map((item) => (
-              item === (lang === "fr" ? "Offres" : lang === "en" ? "Offers" : "Ofertas") ? (
-                <div key={item} className="relative">
-                  <button
-                    type="button"
-                    aria-expanded={programsOpen}
-                    onClick={() => setProgramsOpen((open) => !open)}
-                    className="transition hover:text-red-600"
-                  >
-                    {item}
-                  </button>
-                  {programsOpen && (
-                    <div className="absolute left-1/2 top-full z-20 mt-4 w-64 -translate-x-1/2 rounded-2xl bg-white p-2 text-left shadow-lg ring-1 ring-slate-200">
-                      {t.programs.map((program, index) => (
-                        <a
-                          key={program.name}
-                          href={`/programmes/${["a1-a2-debutant", "b1-b2-intermediaire", "c1-c2-avance"][index]}`}
-                          onClick={() => setProgramsOpen(false)}
-                          className="block rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-red-50 hover:text-red-700"
-                        >
-                          {program.name}
-                        </a>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <a key={item} href={item === "FAQ" ? "#faq" : "#"} className="transition hover:text-slate-900">
-                  {item}
-                </a>
-              )
+              <a
+                key={item}
+                href={
+                  item === t.nav[0]
+                    ? "#presentation"
+                    : item === t.programsTitle
+                      ? "#programs"
+                      : item === "FAQ"
+                        ? "#faq"
+                        : item === t.testimonialsTitle
+                          ? "#reviews"
+                          : "#contact"
+                }
+                className="transition hover:text-slate-900"
+              >
+                {item}
+              </a>
             ))}
           </nav>
 
@@ -243,9 +310,9 @@ export default function Home() {
                 <button className="rounded-full bg-red-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-red-200 transition hover:bg-red-500">
                   {t.primaryCta}
                 </button>
-                <button className="rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-100">
+                <Link href="#presentation" className="rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-100">
                   {t.secondaryCta}
-                </button>
+                </Link>
               </div>
 
               <div className="mt-10 grid gap-4 sm:grid-cols-3">
@@ -273,25 +340,44 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="bg-white py-20">
+        <section id="presentation" className="bg-white py-20">
           <div className="mx-auto max-w-6xl px-6 lg:px-8">
-            <div className="mx-auto max-w-2xl text-center">
-              <h2 className="text-3xl font-black tracking-tight text-slate-900 sm:text-5xl">
-                {t.nav[1]}
-              </h2>
-            </div>
+            <section id="project">
+              <div role="img" aria-label={t.videoPlaceholder} className="video-placeholder mx-auto flex aspect-video max-w-4xl flex-col items-center justify-center gap-4 rounded-2xl text-center text-white shadow-lg">
+                <span aria-hidden="true" className="video-play-mark" />
+                <span className="relative text-sm font-semibold uppercase tracking-[0.16em]">{t.videoPlaceholder}</span>
+              </div>
 
-            <div className="mt-12 grid gap-6 md:grid-cols-3">
-              {t.highlights.map((item) => (
-                <article key={item.title} className="rounded-3xl border border-slate-200 bg-slate-50 p-6 shadow-sm">
-                  <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-red-100 text-lg font-bold text-red-700">
-                    {item.title.charAt(0)}
+              <div className="mt-6 grid items-center gap-8 border-t border-slate-200 pt-6 md:grid-cols-[1fr_0.72fr] md:gap-12">
+                <div>
+                  <h4 className="text-2xl font-bold text-slate-900">{t.teacherName}</h4>
+                  <p className="mt-1 text-sm font-bold uppercase tracking-[0.14em] text-red-600">{t.teacherRole}</p>
+                  <div className="mt-4 space-y-3 text-base leading-7 text-slate-600">
+                    {t.teacherBio.map((paragraph) => (
+                      <p key={paragraph}>{paragraph}</p>
+                    ))}
                   </div>
-                  <h3 className="text-xl font-semibold text-slate-900">{item.title}</h3>
-                  <p className="mt-3 text-base leading-7 text-slate-600">{item.text}</p>
-                </article>
-              ))}
-            </div>
+                </div>
+                <div role="img" aria-label={t.photoPlaceholder} className="teacher-placeholder mx-auto flex aspect-[4/5] w-full max-w-xs flex-col items-center justify-center gap-5 overflow-hidden rounded-2xl text-center shadow-md">
+                  <span aria-hidden="true" className="teacher-placeholder-avatar">RV</span>
+                  <span className="text-sm font-semibold uppercase tracking-[0.14em]">{t.photoPlaceholder}</span>
+                </div>
+              </div>
+            </section>
+
+            <section id="method" className="mt-16 border-t border-slate-200 pt-12">
+              <h3 className="text-2xl font-bold text-slate-900">{t.methodTitle}</h3>
+              <div className="mx-auto mt-8 grid max-w-none gap-x-12 gap-y-2 text-left md:grid-cols-2">
+                {t.methodParagraphs.map((paragraph) => (
+                  <p key={paragraph} className="text-base leading-7 text-slate-600">{paragraph}</p>
+                ))}
+                <p className="text-base leading-7 text-slate-600">
+                  {t.methodOfferStart}
+                  {t.methodOffer}
+                  {t.methodOfferEnd}
+                </p>
+              </div>
+            </section>
           </div>
         </section>
 
@@ -300,19 +386,28 @@ export default function Home() {
             <h2 className="text-3xl font-black tracking-tight text-slate-900 sm:text-5xl">{t.programsTitle}</h2>
           </div>
 
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
-            {t.programs.map((program, index) => (
-              <Link
-                id={`program-${index}`}
-                key={program.name}
-                href={`/programmes/${["a1-a2-debutant", "b1-b2-intermediaire", "c1-c2-avance"][index]}`}
-                className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:border-red-200 hover:shadow-md"
-              >
-                <div className="inline-flex rounded-full bg-red-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-red-700">
-                  {program.name}
-                </div>
-                <p className="mt-4 text-lg leading-8 text-slate-600">{program.text}</p>
-              </Link>
+          <div className="mt-12 grid gap-6 md:grid-cols-2">
+            {t.offerBlocks.map((block) => (
+              <article key={block.title} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+                <h3 className="text-center text-2xl font-black tracking-tight text-slate-900">{block.title}</h3>
+                {block.notes.length > 0 && (
+                  <div className="mt-3 space-y-1 text-center text-sm font-semibold text-red-600">
+                    {block.notes.map((note) => (
+                      <p key={note}>{note}</p>
+                    ))}
+                  </div>
+                )}
+                <ul className="mt-6 divide-y divide-slate-200">
+                  {block.items.map((offer) => (
+                    <li key={offer.slug}>
+                      <Link href={`/offres/${offer.slug}`} className="group block rounded-md px-1 py-4 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600">
+                        <p className="font-semibold text-slate-900 transition-colors group-hover:text-red-600">{offer.name}</p>
+                        <p className="mt-1 text-sm leading-6 text-slate-600">{offer.price}</p>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </article>
             ))}
           </div>
         </section>
@@ -334,10 +429,10 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="bg-slate-900 py-20 text-white">
+        <section id="reviews" className="bg-slate-900 py-20 text-white">
           <div className="mx-auto max-w-6xl px-6 lg:px-8">
             <div className="mx-auto max-w-2xl text-center">
-                <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">{t.testimonialsTitle}</h2>
+                <h2 className="text-3xl font-black tracking-tight text-white sm:text-5xl">{t.testimonialsTitle}</h2>
             </div>
 
             <div className="mt-12 grid gap-6 md:grid-cols-3">
@@ -363,7 +458,7 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="border-t border-slate-200 bg-white">
+      <footer id="contact" className="border-t border-slate-200 bg-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-8 text-sm text-slate-500 lg:px-8">
           <p>{t.footer}</p>
           <p>bonjour@rendez-vous.fr</p>
