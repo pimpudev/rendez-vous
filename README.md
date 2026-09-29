@@ -27,7 +27,7 @@ npm run start
 
 ## Supabase setup
 
-1. Create a Supabase project and copy `.env.example` to `.env.local`. Fill in the project URL and the publishable/anon key.
+1. Create a Supabase project and copy `.env.example` to `.env.local`. Fill in `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` with the values shown in **Connect > Framework > Next.js > App Router**.
 2. Run `supabase/schema.sql` in the Supabase SQL Editor. It creates the reservations tables, row-level security policies, and a clearly marked demo client.
 3. Create an admin account in **Authentication > Users**, then add its user UUID to `public.admin_users` from the SQL Editor:
 
