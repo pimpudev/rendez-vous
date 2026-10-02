@@ -18,7 +18,7 @@ export default async function ReservationPage({
         <header className="flex items-center justify-between rounded-full bg-white px-5 py-3 shadow-sm">
           <div className="flex items-center gap-3">
             <Link href="/" className="font-bold text-slate-900 transition hover:text-red-600">
-              Rendez-vous
+              Rendez-Vous
             </Link>
             <ThemeToggle />
           </div>

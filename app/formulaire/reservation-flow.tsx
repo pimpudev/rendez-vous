@@ -145,24 +145,19 @@ export default function ReservationFlow({
     setErrorMessage("");
 
     try {
-      const { error } = await supabase.from("reservations").insert({
-        first_name: text("first_name"),
-        last_name: text("last_name"),
-        email: text("email"),
-        french_level: level,
-        french_levels: level ? [level] : [],
-        offer: selectedOffer,
-        interests: selectedOffer,
-        offer_details: offerDetails,
-        availability_slots: availabilitySlots,
-        registration_type: registrationType,
-        course_type: offerType === "individual" ? "individual" : "group",
-        student_status: registrationType === 3 ? "waitlist" : "to_validate",
-        selected_group_id: selectedGroup?.id ?? null,
-        group_name: null,
-        payment_status: "pending",
-        course_status: "unassigned",
-        is_demo: false,
+      const { error } = await supabase.rpc("submit_reservation", {
+        payload: {
+          first_name: text("first_name"),
+          last_name: text("last_name"),
+          email: text("email"),
+          french_level: level,
+          offer: selectedOffer,
+          offer_details: offerDetails,
+          availability_slots: availabilitySlots,
+          registration_type: registrationType,
+          selected_group_id: selectedGroup?.id ?? null,
+          comment: text("comment"),
+        },
       });
 
       if (error) {

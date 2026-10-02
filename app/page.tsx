@@ -1,10 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import ThemeToggle from "./theme-toggle";
 
 type Language = "fr" | "en" | "es";
+
+const languageOptions = {
+  fr: { label: "Français" },
+  en: { label: "English" },
+  es: { label: "Español" },
+} satisfies Record<Language, { label: string }>;
 
 const content = {
   fr: {
@@ -76,11 +82,11 @@ const content = {
     ctaTitle: "Prêt(e) à faire passer votre français au niveau supérieur ?",
     ctaText: "Rendez votre objectif accessible avec un accompagnement humain et personnalisé.",
     ctaButton: "Prendre rendez-vous",
-    footer: "© 2026 Rendez-vous • Formations linguistiques",
+    footer: "© 2026 Rendez-Vous • Formations linguistiques",
   },
   en: {
     subtitle:
-      "Individual or group online French courses for adults, students, and professionals.\nTo discover or deepen the French language, choose Rendez-vous, the online French platform that adapts to your needs.",
+      "Individual or group online French courses for adults, students, and professionals.\nTo discover or deepen the French language, choose Rendez-Vous, the online French platform that adapts to your needs.",
     primaryCta: "Book a lesson",
     secondaryCta: "Discover the presentation",
     stats: [
@@ -148,11 +154,11 @@ const content = {
     ctaTitle: "Ready to move your French to the next level?",
     ctaText: "Turn your goal into a clear plan with human, personalized support.",
     ctaButton: "Schedule a session",
-    footer: "© 2026 Rendez-vous • Language training",
+    footer: "© 2026 Rendez-Vous • Language training",
   },
   es: {
     subtitle:
-      "Cursos de francés en línea individuales o grupales para adultos, estudiantes y profesionales.\nPara descubrir o perfeccionar el francés, elige Rendez-vous, la plataforma en línea que se adapta a tus necesidades.",
+      "Cursos de francés en línea individuales o grupales para adultos, estudiantes y profesionales.\nPara descubrir o perfeccionar el francés, elige Rendez-Vous, la plataforma en línea que se adapta a tus necesidades.",
     primaryCta: "Reservar una clase",
     secondaryCta: "Descubrir la presentación",
     stats: [
@@ -220,7 +226,7 @@ const content = {
     ctaTitle: "¿Listo para llevar tu francés al siguiente nivel?",
     ctaText: "Haz que tu objetivo sea alcanzable con un acompañamiento humano y personalizado.",
     ctaButton: "Pedir una cita",
-    footer: "© 2026 Rendez-vous • Formación lingüística",
+    footer: "© 2026 Rendez-Vous • Formación lingüística",
   },
 } as const;
 
@@ -255,42 +261,72 @@ function renderTeacherBio(text: string, teacherName: string) {
 
 export default function Home() {
   const [lang, setLang] = useState<Language>("fr");
+  const [introVisible, setIntroVisible] = useState(true);
+  const [introLeaving, setIntroLeaving] = useState(false);
   const t = content[lang];
+
+  useEffect(() => {
+    if (!introVisible) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const leaveTimer = window.setTimeout(() => setIntroLeaving(true), 2600);
+    const hideTimer = window.setTimeout(() => setIntroVisible(false), 3600);
+
+    return () => {
+      window.clearTimeout(leaveTimer);
+      window.clearTimeout(hideTimer);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [introVisible]);
 
   return (
     <div className="site-shell min-h-screen bg-[linear-gradient(180deg,_#EAF3F8_0%,_#DDECF5_35%,_#C9DDEA_68%,_#B6CCE1_100%)] text-slate-800">
-      <header className="mx-auto max-w-6xl px-6 py-6 lg:px-8">
-        <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center rounded-full bg-white px-3 py-3 shadow-sm sm:px-4">
-          <div className="justify-self-start">
+      {introVisible && (
+        <div className={`brand-intro${introLeaving ? " brand-intro--leaving" : ""}`} aria-hidden="true">
+          <div className="brand-intro-logo">
+            <span className="brand-intro-name">Rendez-Vous</span>
+            <div className="brand-intro-mark">
+              <span className="brand-intro-r">R</span>
+              <span className="brand-intro-v">V</span>
+            </div>
+          </div>
+        </div>
+      )}
+      <header inert={introVisible} aria-hidden={introVisible} className="mx-auto max-w-6xl px-6 py-6 lg:px-8">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-y-2 rounded-full bg-white px-3 py-3 shadow-sm sm:gap-y-0 sm:px-4">
+          <div className="col-start-1 row-start-1 justify-self-start">
             <ThemeToggle language={lang} />
           </div>
-          <Link href="#programs" className="justify-self-center whitespace-nowrap rounded-full bg-slate-900 px-1.5 py-2 text-[10px] font-medium text-white transition hover:bg-slate-700 sm:px-4 sm:text-sm">
+          <Link href="#programs" className="col-span-3 row-start-2 justify-self-center whitespace-nowrap rounded-full bg-slate-900 px-2 py-2 text-[11px] font-medium text-white transition hover:bg-slate-700 sm:col-span-1 sm:col-start-2 sm:row-start-1 sm:px-4 sm:text-sm">
             {t.primaryCta}
           </Link>
-          <div className="inline-flex min-w-0 justify-self-end rounded-full border border-slate-200 bg-slate-100 p-1">
+          <div className="col-start-3 row-start-1 inline-flex min-w-0 justify-self-end rounded-full border border-slate-200 bg-slate-100 p-1">
             {(["fr", "en", "es"] as const).map((option) => (
               <button
                 key={option}
                 type="button"
                 onClick={() => setLang(option)}
                 aria-pressed={lang === option}
-                className={`rounded-full px-0.5 py-1 text-[9px] font-semibold transition sm:px-2.5 sm:text-xs ${
+                aria-label={languageOptions[option].label}
+                title={languageOptions[option].label}
+                className={`inline-flex h-7 items-center justify-center rounded-full px-1.5 text-[10px] font-semibold transition sm:h-8 sm:px-2.5 sm:text-xs ${
                   lang === option ? "bg-white text-slate-900 shadow-sm" : "text-slate-500"
                 }`}
               >
-                {option.toUpperCase()}
+                <span>{option.toUpperCase()}</span>
               </button>
             ))}
           </div>
         </div>
       </header>
 
-      <main>
+      <main inert={introVisible} aria-hidden={introVisible}>
         <section className="mx-auto max-w-6xl px-6 pb-16 pt-8 lg:px-8 lg:pb-24">
           <div className="grid items-center gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
             <div className="text-center lg:text-left">
               <h1 className="mt-0 text-left text-3xl font-black tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
-                <span className="block text-red-600">Rendez-vous</span>
+                <span className="block text-red-600">Rendez-Vous</span>
               </h1>
               <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600 lg:text-left" style={{ whiteSpace: "pre-line" }}>
                 {emphasizeProjectName(t.subtitle)}
@@ -328,7 +364,7 @@ export default function Home() {
                     <span className="flex h-24 w-24 items-center justify-center rounded-full bg-red-600 text-4xl font-black text-white shadow-lg shadow-red-200">R</span>
                     <span className="-ml-5 mt-8 flex h-20 w-20 items-center justify-center rounded-full border-4 border-[#EAF3F8] bg-slate-900 text-3xl font-black text-white">V</span>
                   </div>
-                  <p className="mt-6 text-4xl font-black tracking-tight text-slate-900">Rendez-vous</p>
+                  <p className="mt-6 text-4xl font-black tracking-tight text-slate-900">Rendez-Vous</p>
                 </div>
               </div>
             </div>
@@ -451,7 +487,7 @@ export default function Home() {
         </section>
       </main>
 
-      <footer id="contact" className="border-t border-slate-200 bg-white">
+      <footer id="contact" inert={introVisible} aria-hidden={introVisible} className="border-t border-slate-200 bg-white">
         <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-3 px-6 py-8 text-sm text-slate-500 sm:grid-cols-3 lg:px-8">
           <Link href="/admin" className="justify-self-start font-semibold transition hover:text-red-600">
             Admin

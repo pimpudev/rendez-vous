@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Rendez-vous | Formations linguistiques",
+  title: "Rendez-Vous | Formations linguistiques",
   description: "Site de formations linguistiques pour adultes, étudiants et professionnels.",
 };
 

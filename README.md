@@ -28,7 +28,7 @@ npm run start
 ## Supabase setup
 
 1. Create a Supabase project and copy `.env.example` to `.env.local`. Fill in `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` with the values shown in **Connect > Framework > Next.js > App Router**.
-2. For a new database, run `supabase/schema.sql`, then run `supabase/migrations/202610020001_student_intake.sql` in the SQL Editor. If the original schema was already applied, run only the migration. It preserves existing reservations and adds the individual/group form fields and `course_groups` table.
+2. For a new database, run `supabase/schema.sql`, then run migrations `202610020001_student_intake.sql`, `202610020002_merge_student_registrations.sql`, and `202610020003_admin_delete_reservations.sql` in order from `supabase/migrations/`. If earlier migrations are already applied, run only the missing migrations, still in order. The student view combines applications by e-mail while retaining a separate status for every course. The second migration adds a second marked demo registration for Camille.
 3. To preview a type 2 group registration, add an open group for the exact offer name. This sample is optional:
 
 ```sql
@@ -46,4 +46,4 @@ insert into public.admin_users (user_id) values ('ADMIN_USER_UUID');
 
 5. Restart the development server and sign in at `/admin/etudiants` with that account. The `/admin` page links to Étudiants, Groupes, and Planning; Groupes and Planning are placeholders for now.
 
-The public form can only create reservations with their initial statuses. Only signed-in users listed in `admin_users` can read or update them. Never use a Supabase `service_role` or secret key in this app.
+The public form can only create reservations with their initial statuses. Only signed-in users listed in `admin_users` can read, update, or delete reservations. “Supprimer ce cours” removes one registration; “Supprimer” removes every registration for that student. Never use a Supabase `service_role` or secret key in this app.
