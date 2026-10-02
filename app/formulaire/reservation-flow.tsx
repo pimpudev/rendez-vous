@@ -193,7 +193,7 @@ export default function ReservationFlow({
     <form onSubmit={handleSubmit} className="mx-auto mb-16 max-w-4xl rounded-2xl border border-slate-200 bg-white px-6 py-2 shadow-sm sm:px-10">
       <div className="border-b border-slate-200 py-5">
         <p className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-500">
-          {offerType === "individual" ? "Formulaire 1 — Individuel · Inscription type 1" : "Formulaire 2 — Groupe · Inscription type 2 ou 3"}
+          {offerType === "individual" ? "Formulaire individuel" : "Formulaire groupe"}
         </p>
         <p className="mt-3 text-base leading-7 text-slate-600">Merci pour votre intérêt.</p>
         <p className="text-base leading-7 text-slate-600">Vous êtes à quelques clics de prendre Rendez-Vous.</p>

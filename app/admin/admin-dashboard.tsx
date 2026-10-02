@@ -537,10 +537,10 @@ export default function AdminDashboard() {
                       {student.registrations.map((registration) => (
                         <div key={registration.id} className="border-b border-slate-200 pb-3 last:border-0 last:pb-0">
                           <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                            Type {registration.registration_type} · {registration.registration_type === 1 ? "INDIVIDUEL" : "GROUPE"}
+                            {registration.offer} · {registration.course_type === "individual" ? "Cours individuel" : "Cours groupe"}
                           </p>
                           <select
-                            aria-label={`Statut ${registration.registration_type} de ${student.first_name} ${student.last_name}`}
+                            aria-label={`Statut du cours ${registration.offer} de ${student.first_name} ${student.last_name}`}
                             value={registration.student_status}
                             disabled={isSaving}
                             onChange={(event) => void updateReservation(registration.id, { student_status: event.target.value as StudentStatus })}
@@ -561,9 +561,8 @@ export default function AdminDashboard() {
                     <div className="space-y-4">
                       {student.registrations.map((registration) => (
                         <div key={registration.id} className="border-b border-slate-200 pb-3 last:border-0 last:pb-0">
-                          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Type {registration.registration_type}</p>
                           <input
-                            aria-label={`Offre type ${registration.registration_type} de ${student.first_name} ${student.last_name}`}
+                            aria-label={`Offre de ${student.first_name} ${student.last_name} : ${registration.offer}`}
                             defaultValue={registration.offer}
                             disabled={isSaving}
                             onBlur={(event) => {
@@ -572,7 +571,7 @@ export default function AdminDashboard() {
                             className={selectClassName}
                           />
                           <textarea
-                            aria-label={`Détails offre type ${registration.registration_type} de ${student.first_name} ${student.last_name}`}
+                            aria-label={`Détails de l’offre ${registration.offer} de ${student.first_name} ${student.last_name}`}
                             defaultValue={registration.offer_details}
                             rows={3}
                             disabled={isSaving}
@@ -597,9 +596,9 @@ export default function AdminDashboard() {
                     <div className="space-y-4">
                       {student.registrations.map((registration) => (
                         <div key={registration.id} className="border-b border-slate-200 pb-3 last:border-0 last:pb-0">
-                          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Type {registration.registration_type}</p>
+                          <p className="mb-2 text-xs font-semibold text-slate-600">{registration.offer}</p>
                           <textarea
-                            aria-label={`Commentaire type ${registration.registration_type} de ${student.first_name} ${student.last_name}`}
+                            aria-label={`Commentaire de l’offre ${registration.offer} de ${student.first_name} ${student.last_name}`}
                             defaultValue={registration.comment}
                             rows={3}
                             disabled={isSaving}
