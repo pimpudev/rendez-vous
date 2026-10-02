@@ -8,8 +8,6 @@ type Language = "fr" | "en" | "es";
 
 const content = {
   fr: {
-    nav: ["Présentation", "Cours", "FAQ", "Avis", "Contact"],
-    badge: "Formation de français • En ligne",
     subtitle: "Bienvenue sur notre plateforme de cours de français en ligne.\nDébutant ou expert, nous avons la formation qui correspond à vos objectifs.",
     primaryCta: "Réserver un cours",
     secondaryCta: "Découvrir la présentation",
@@ -40,10 +38,10 @@ const content = {
     methodOffer: "l’offre",
     methodOfferEnd: " qui vous correspond.",
     programsTitle: "Cours",
+    offerLinkLabel: "Voir l’offre",
     offerBlocks: [
       {
         title: "INDIVIDUEL",
-        notes: [],
         items: [
           { slug: "individuel-professionnel", name: "Professionnel – 1 à 4 compétences", price: "3000 roupies = 30 euros / heure" },
           { slug: "individuel-delf-dalf", name: "DELF DALF – 4 compétences", price: "2500 roupies = 25 euros / heure" },
@@ -53,7 +51,6 @@ const content = {
       },
       {
         title: "GROUPE",
-        notes: ["Minimum 4 étudiants / Maximum 10 étudiants", "Minimum 10 heures"],
         items: [
           { slug: "groupe-delf-a1-a2-b1", name: "DELF A1-A2-B1 – 4 compétences", price: "1000 roupies = 10 euros / heure / étudiant" },
           { slug: "groupe-delf-b2-dalf-c1-c2", name: "DELF B2 - DALF C1-C2 – 4 compétences", price: "1500 roupies = 15 euros / heure / étudiant" },
@@ -82,8 +79,6 @@ const content = {
     footer: "© 2026 Rendez-vous • Formations linguistiques",
   },
   en: {
-    nav: ["Presentation", "Courses", "FAQ", "Reviews", "Contact"],
-    badge: "French training • Online",
     subtitle:
       "Individual or group online French courses for adults, students, and professionals.\nTo discover or deepen the French language, choose Rendez-vous, the online French platform that adapts to your needs.",
     primaryCta: "Book a lesson",
@@ -115,10 +110,10 @@ const content = {
     methodOffer: "the offer",
     methodOfferEnd: " that suits you.",
     programsTitle: "Courses",
+    offerLinkLabel: "View course",
     offerBlocks: [
       {
         title: "INDIVIDUAL",
-        notes: [],
         items: [
           { slug: "individuel-professionnel", name: "Professional – 1 to 4 skills", price: "3,000 rupees = 30 euros / hour" },
           { slug: "individuel-delf-dalf", name: "DELF DALF – 4 skills", price: "2,500 rupees = 25 euros / hour" },
@@ -128,7 +123,6 @@ const content = {
       },
       {
         title: "GROUP",
-        notes: ["Minimum 4 students / Maximum 10 students", "Minimum 10 hours"],
         items: [
           { slug: "groupe-delf-a1-a2-b1", name: "DELF A1-A2-B1 – 4 skills", price: "1,000 rupees = 10 euros / hour / student" },
           { slug: "groupe-delf-b2-dalf-c1-c2", name: "DELF B2 - DALF C1-C2 – 4 skills", price: "1,500 rupees = 15 euros / hour / student" },
@@ -157,8 +151,6 @@ const content = {
     footer: "© 2026 Rendez-vous • Language training",
   },
   es: {
-    nav: ["Presentación", "Cursos", "FAQ", "Opiniones", "Contacto"],
-    badge: "Formación de francés • En línea",
     subtitle:
       "Cursos de francés en línea individuales o grupales para adultos, estudiantes y profesionales.\nPara descubrir o perfeccionar el francés, elige Rendez-vous, la plataforma en línea que se adapta a tus necesidades.",
     primaryCta: "Reservar una clase",
@@ -190,10 +182,10 @@ const content = {
     methodOffer: "la oferta",
     methodOfferEnd: " que mejor se adapte a ti.",
     programsTitle: "Cursos",
+    offerLinkLabel: "Ver curso",
     offerBlocks: [
       {
         title: "INDIVIDUAL",
-        notes: [],
         items: [
           { slug: "individuel-professionnel", name: "Profesional – 1 a 4 competencias", price: "3000 rupias = 30 euros / hora" },
           { slug: "individuel-delf-dalf", name: "DELF DALF – 4 competencias", price: "2500 rupias = 25 euros / hora" },
@@ -203,7 +195,6 @@ const content = {
       },
       {
         title: "GRUPO",
-        notes: ["Mínimo 4 estudiantes / Máximo 10 estudiantes", "Mínimo 10 horas"],
         items: [
           { slug: "groupe-delf-a1-a2-b1", name: "DELF A1-A2-B1 – 4 competencias", price: "1000 rupias = 10 euros / hora / estudiante" },
           { slug: "groupe-delf-b2-dalf-c1-c2", name: "DELF B2 - DALF C1-C2 – 4 competencias", price: "1500 rupias = 15 euros / hora / estudiante" },
@@ -269,54 +260,27 @@ export default function Home() {
   return (
     <div className="site-shell min-h-screen bg-[linear-gradient(180deg,_#EAF3F8_0%,_#DDECF5_35%,_#C9DDEA_68%,_#B6CCE1_100%)] text-slate-800">
       <header className="mx-auto max-w-6xl px-6 py-6 lg:px-8">
-        <div className="relative flex items-center justify-end rounded-full bg-white px-4 py-3 shadow-sm">
-          <div className="absolute left-5 top-1/2 z-10 flex -translate-y-1/2 items-center gap-3">
-            <Link href="/" className="font-bold text-slate-900 transition hover:text-red-600">
-              Rendez-vous
-            </Link>
+        <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center rounded-full bg-white px-3 py-3 shadow-sm sm:px-4">
+          <div className="justify-self-start">
             <ThemeToggle language={lang} />
           </div>
-          <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-5 font-sans text-sm font-bold text-slate-900 md:flex">
-            {t.nav.map((item) => (
-              <a
-                key={item}
-                href={
-                  item === t.nav[0]
-                    ? "#presentation"
-                    : item === t.programsTitle
-                      ? "#programs"
-                      : item === "FAQ"
-                        ? "#faq"
-                        : item === t.testimonialsTitle
-                          ? "#reviews"
-                          : "#contact"
-                }
-                className="transition hover:text-slate-900"
+          <Link href="#programs" className="justify-self-center whitespace-nowrap rounded-full bg-slate-900 px-1.5 py-2 text-[10px] font-medium text-white transition hover:bg-slate-700 sm:px-4 sm:text-sm">
+            {t.primaryCta}
+          </Link>
+          <div className="inline-flex min-w-0 justify-self-end rounded-full border border-slate-200 bg-slate-100 p-1">
+            {(["fr", "en", "es"] as const).map((option) => (
+              <button
+                key={option}
+                type="button"
+                onClick={() => setLang(option)}
+                aria-pressed={lang === option}
+                className={`rounded-full px-0.5 py-1 text-[9px] font-semibold transition sm:px-2.5 sm:text-xs ${
+                  lang === option ? "bg-white text-slate-900 shadow-sm" : "text-slate-500"
+                }`}
               >
-                {item}
-              </a>
+                {option.toUpperCase()}
+              </button>
             ))}
-          </nav>
-
-          <div className="flex items-center gap-3">
-            <div className="inline-flex rounded-full border border-slate-200 bg-slate-100 p-1">
-              {(["fr", "en", "es"] as const).map((option) => (
-                <button
-                  key={option}
-                  type="button"
-                  onClick={() => setLang(option)}
-                  aria-pressed={lang === option}
-                  className={`rounded-full px-2.5 py-1 text-xs font-semibold transition ${
-                    lang === option ? "bg-white text-slate-900 shadow-sm" : "text-slate-500"
-                  }`}
-                >
-                  {option.toUpperCase()}
-                </button>
-              ))}
-            </div>
-            <button className="hidden rounded-full bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700 sm:inline-flex">
-              {t.primaryCta}
-            </button>
           </div>
         </div>
       </header>
@@ -325,10 +289,7 @@ export default function Home() {
         <section className="mx-auto max-w-6xl px-6 pb-16 pt-8 lg:px-8 lg:pb-24">
           <div className="grid items-center gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
             <div className="text-center lg:text-left">
-              <span className="inline-flex rounded-full border border-red-200 bg-red-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-red-700">
-                {t.badge}
-              </span>
-              <h1 className="mt-6 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
+              <h1 className="mt-0 text-left text-3xl font-black tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
                 <span className="block text-red-600">Rendez-vous</span>
               </h1>
               <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600 lg:text-left" style={{ whiteSpace: "pre-line" }}>
@@ -368,7 +329,6 @@ export default function Home() {
                     <span className="-ml-5 mt-8 flex h-20 w-20 items-center justify-center rounded-full border-4 border-[#EAF3F8] bg-slate-900 text-3xl font-black text-white">V</span>
                   </div>
                   <p className="mt-6 text-4xl font-black tracking-tight text-slate-900">Rendez-vous</p>
-                  <p className="mt-2 text-xs font-bold uppercase tracking-[0.2em] text-red-600">{t.badge}</p>
                 </div>
               </div>
             </div>
@@ -421,28 +381,26 @@ export default function Home() {
             <h2 className="text-3xl font-black tracking-tight text-slate-900 sm:text-5xl">{t.programsTitle}</h2>
           </div>
 
-          <div className="mt-12 grid gap-6 md:grid-cols-2">
+          <div className="mt-10 space-y-14">
             {t.offerBlocks.map((block) => (
-              <article key={block.title} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-                <h3 className="text-center text-2xl font-black tracking-tight text-slate-900">{block.title}</h3>
-                {block.notes.length > 0 && (
-                  <div className="mt-3 space-y-1 text-center text-sm font-semibold text-red-600">
-                    {block.notes.map((note) => (
-                      <p key={note}>{note}</p>
-                    ))}
-                  </div>
-                )}
-                <ul className="mt-6 divide-y divide-slate-200">
+              <section key={block.title} aria-label={block.title}>
+                <div className="border-b border-slate-200 pb-4">
+                  <h3 className="text-2xl font-black tracking-tight text-slate-900">{block.title}</h3>
+                </div>
+                <div className="mt-5 overflow-x-auto border-y border-slate-200">
+                  <div className="grid min-w-[1120px] grid-cols-4 divide-x divide-slate-200">
                   {block.items.map((offer) => (
-                    <li key={offer.slug}>
-                      <Link href={`/offres/${offer.slug}`} className="group block rounded-md px-1 py-4 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600">
-                        <p className="font-semibold text-slate-900 transition-colors group-hover:text-red-600">{offer.name}</p>
-                        <p className="mt-1 text-sm leading-6 text-slate-600">{offer.price}</p>
-                      </Link>
-                    </li>
+                    <Link key={offer.slug} href={`/offres/${offer.slug}`} className="group flex min-h-[300px] flex-col bg-white px-6 py-7 transition-colors hover:bg-slate-50 focus-visible:relative focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-red-600">
+                        <h4 className="min-h-[4.5rem] text-lg font-bold leading-6 text-slate-900">{offer.name}</h4>
+                        <p className="mt-5 text-lg font-black leading-7 text-slate-900">{offer.price}</p>
+                        <span className="mt-auto inline-flex min-h-10 items-center justify-center rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition-colors group-hover:bg-red-600">
+                          {t.offerLinkLabel}
+                        </span>
+                    </Link>
                   ))}
-                </ul>
-              </article>
+                  </div>
+                </div>
+              </section>
             ))}
           </div>
         </section>
