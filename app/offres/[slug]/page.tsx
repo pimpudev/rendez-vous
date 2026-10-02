@@ -135,7 +135,7 @@ export default async function OfferPage({
 
         <div className="pb-16 text-center">
           <Link
-            href={`/formulaire?offre=${encodeURIComponent(offer.name)}`}
+            href={`/formulaire?offre=${encodeURIComponent(offer.name)}&type=${offer.category === "INDIVIDUEL" ? "individual" : "group"}`}
             className="inline-flex min-h-14 items-center justify-center rounded-full bg-red-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-red-200 transition hover:bg-red-500 sm:text-lg"
           >
             Réserver ce cours

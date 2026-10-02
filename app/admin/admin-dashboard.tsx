@@ -4,34 +4,25 @@ import { useEffect, useState, type FormEvent } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { getSupabaseClient } from "../../lib/supabase";
 
-type PaymentStatus = "pending" | "paid";
-type CourseStatus = "unassigned" | "individual" | "group_pending" | "group_assigned";
+type CourseType = "individual" | "group" | "individual_group";
+type StudentStatus = "waitlist" | "to_validate" | "payment_pending" | "enrolled" | "paused" | "finished";
 type AccessStatus = "checking" | "demo" | "signed-out" | "denied" | "ready" | "error";
 
 type Reservation = {
   id: string;
   first_name: string;
   last_name: string;
-  age: number;
   email: string;
-  interests: string;
-  enrolled_in_school: boolean;
+  french_level: string | null;
   french_levels: string[];
-  professional_status: string[];
-  discovery_sources: string[];
-  desired_duration: string[];
-  weekly_hours: string[];
-  availability_periods: string[];
-  available_immediately: boolean;
-  available_from: string | null;
-  available_until: string | null;
-  no_deadline: boolean;
-  payment_methods: string[];
-  comment: string;
+  registration_type: 1 | 2 | 3;
+  course_type: CourseType;
+  student_status: StudentStatus;
   offer: string;
-  payment_status: PaymentStatus;
-  course_status: CourseStatus;
-  group_name: string | null;
+  offer_details: string;
+  availability_slots: string[];
+  selected_group_id: string | null;
+  comment: string;
   is_demo: boolean;
   created_at: string;
 };
@@ -45,26 +36,17 @@ const demoReservation: Reservation = {
   id: "demo-reservation-001",
   first_name: "Camille",
   last_name: "Martin",
-  age: 29,
   email: "camille.martin@example.com",
-  interests: "Cours libre – 3 compétences",
-  enrolled_in_school: false,
-  french_levels: ["A2", "B1"],
-  professional_status: ["Travailleur"],
-  discovery_sources: ["un ami"],
-  desired_duration: ["10 heures"],
-  weekly_hours: ["deux heures par semaine"],
-  availability_periods: ["le week-end", "le matin"],
-  available_immediately: true,
-  available_from: null,
-  available_until: null,
-  no_deadline: true,
-  payment_methods: ["via UPI"],
+  french_level: "B1",
+  french_levels: ["B1"],
+  registration_type: 3,
+  course_type: "group",
+  student_status: "waitlist",
+  offer: "OFFRE DE COURS GROUPÉ XYZ",
+  offer_details: "Disponibilités : samedi 10:00–11:00, samedi 11:00–12:00",
+  availability_slots: ["Samedi 10:00–11:00", "Samedi 11:00–12:00"],
+  selected_group_id: null,
   comment: "",
-  offer: "Cours libre – 3 compétences",
-  payment_status: "pending",
-  course_status: "group_pending",
-  group_name: null,
   is_demo: true,
   created_at: "2026-09-01T09:00:00.000Z",
 };
@@ -99,6 +81,7 @@ async function loadAdminReservations(
 
 const selectClassName =
   "min-h-10 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-200";
+const frenchLevels = ["COMPLETE BEGINNER", "A1", "A2", "B1", "B2", "C1", "C2"];
 
 export default function AdminDashboard() {
   const [accessStatus, setAccessStatus] = useState<AccessStatus>(() =>
@@ -110,8 +93,7 @@ export default function AdminDashboard() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState("");
-  const [rowErrors, setRowErrors] = useState<Record<string, string>>({});
-  const [groupDrafts, setGroupDrafts] = useState<Record<string, string>>({});
+  const [saveError, setSaveError] = useState("");
   const [savingId, setSavingId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -186,7 +168,7 @@ export default function AdminDashboard() {
 
   async function updateReservation(
     reservationId: string,
-    updates: Partial<Pick<Reservation, "payment_status" | "course_status" | "group_name">>,
+    updates: Partial<Pick<Reservation, "french_level" | "french_levels" | "course_type" | "student_status" | "offer" | "offer_details" | "comment">>,
   ) {
     if (accessStatus === "demo") {
       setReservations((current) => current.map((reservation) =>
@@ -199,7 +181,7 @@ export default function AdminDashboard() {
     if (!supabase) return;
 
     setSavingId(reservationId);
-    setRowErrors((current) => ({ ...current, [reservationId]: "" }));
+    setSaveError("");
 
     const { data, error } = await supabase
       .from("reservations")
@@ -211,7 +193,7 @@ export default function AdminDashboard() {
     setSavingId(null);
 
     if (error) {
-      setRowErrors((current) => ({ ...current, [reservationId]: "Modification non enregistrée. Réessayez." }));
+      setSaveError("Modification non enregistrée. Vérifiez votre connexion puis réessayez.");
       return;
     }
 
@@ -272,8 +254,8 @@ export default function AdminDashboard() {
     );
   }
 
-  const pendingPayments = reservations.filter((reservation) => reservation.payment_status === "pending").length;
-  const waitingForGroup = reservations.filter((reservation) => reservation.course_status === "group_pending").length;
+  const toValidate = reservations.filter((reservation) => reservation.student_status === "to_validate").length;
+  const waitingList = reservations.filter((reservation) => reservation.student_status === "waitlist").length;
 
   return (
     <section className="mx-auto mb-16 max-w-6xl">
@@ -303,132 +285,126 @@ export default function AdminDashboard() {
           <p className="mt-1 text-2xl font-bold text-slate-900">{reservations.length}</p>
         </div>
         <div className="rounded-xl border border-slate-200 bg-white p-5">
-          <p className="text-sm text-slate-600">En attente de paiement</p>
-          <p className="mt-1 text-2xl font-bold text-slate-900">{pendingPayments}</p>
+          <p className="text-sm text-slate-600">À valider</p>
+          <p className="mt-1 text-2xl font-bold text-slate-900">{toValidate}</p>
         </div>
         <div className="rounded-xl border border-slate-200 bg-white p-5">
-          <p className="text-sm text-slate-600">En attente d’un groupe</p>
-          <p className="mt-1 text-2xl font-bold text-slate-900">{waitingForGroup}</p>
+          <p className="text-sm text-slate-600">Liste d’attente</p>
+          <p className="mt-1 text-2xl font-bold text-slate-900">{waitingList}</p>
         </div>
       </div>
 
+      {saveError && <p role="alert" className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800">{saveError}</p>}
+
       <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
-        <table className="w-full min-w-[1480px] border-collapse text-left text-sm">
+        <table className="w-full min-w-[1120px] border-collapse text-left text-sm">
           <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-600">
             <tr>
-              <th scope="col" className="px-4 py-3">Client</th>
-              <th scope="col" className="px-4 py-3">Offre / intérêt</th>
-              <th scope="col" className="px-4 py-3">Profil</th>
-              <th scope="col" className="px-4 py-3">Institut / origine</th>
-              <th scope="col" className="px-4 py-3">Disponibilités</th>
-              <th scope="col" className="px-4 py-3">Paiement</th>
-              <th scope="col" className="px-4 py-3">Cours / groupe</th>
+              <th scope="col" className="px-4 py-3">Nom</th>
+              <th scope="col" className="px-4 py-3">Prénom</th>
+              <th scope="col" className="px-4 py-3">Niveau</th>
+              <th scope="col" className="px-4 py-3">Cours</th>
+              <th scope="col" className="px-4 py-3">Statut</th>
+              <th scope="col" className="px-4 py-3">Offre</th>
               <th scope="col" className="px-4 py-3">Commentaire</th>
-              <th scope="col" className="px-4 py-3">Reçu le</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200">
             {reservations.map((reservation) => {
-              const groupName = groupDrafts[reservation.id] ?? reservation.group_name ?? "";
               const isSaving = savingId === reservation.id;
+              const frenchLevel = reservation.french_level ?? reservation.french_levels[0] ?? "";
 
               return (
                 <tr key={reservation.id} className="align-top">
                   <td className="px-4 py-4">
-                    <p className="font-semibold text-slate-900">{reservation.first_name} {reservation.last_name}</p>
+                    <p className="font-semibold text-slate-900">{reservation.last_name}</p>
                     {reservation.is_demo && <span className="mt-1 inline-flex rounded-full bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-700">Démo</span>}
-                    <p className="mt-1 whitespace-nowrap text-slate-600">{reservation.age} ans</p>
-                    <a href={`mailto:${reservation.email}`} className="mt-1 inline-block text-slate-600 underline decoration-slate-300 underline-offset-2 hover:text-red-600">{reservation.email}</a>
-                  </td>
-                  <td className="max-w-56 px-4 py-4 text-slate-700">
-                    <p className="font-semibold">{reservation.offer || "Offre non précisée"}</p>
-                    {reservation.interests && reservation.interests !== reservation.offer && <p className="mt-1 text-xs text-slate-500">{reservation.interests}</p>}
+                    <p className="mt-1 text-xs text-slate-500">Inscription type {reservation.registration_type}</p>
                   </td>
                   <td className="px-4 py-4 text-slate-700">
-                    <p>{reservation.french_levels.join(", ") || "Niveau non précisé"}</p>
-                    <p className="mt-1 text-xs text-slate-500">{reservation.professional_status.join(", ")}</p>
-                  </td>
-                  <td className="px-4 py-4 text-slate-700">
-                    <p>{reservation.enrolled_in_school ? "Inscrit dans un institut" : "Institut non indiqué"}</p>
-                    <p className="mt-1 text-xs text-slate-500">{reservation.discovery_sources.length ? `Découvert via : ${reservation.discovery_sources.join(", ")}` : "Origine non indiquée"}</p>
-                  </td>
-                  <td className="max-w-56 px-4 py-4 text-slate-700">
-                    <p>{reservation.desired_duration.join(", ")}</p>
-                    <p className="mt-1">{reservation.weekly_hours.join(", ")}</p>
-                    <p className="mt-1 text-xs text-slate-500">{reservation.available_immediately ? "Dès que possible" : ""}{reservation.availability_periods.length ? ` · ${reservation.availability_periods.join(", ")}` : ""}</p>
-                    {(reservation.available_from || reservation.available_until) && (
-                      <p className="mt-1 text-xs text-slate-500">{reservation.available_from ?? ""}{reservation.available_until ? ` – ${reservation.available_until}` : ""}</p>
-                    )}
-                    {reservation.no_deadline && <p className="mt-1 text-xs text-slate-500">Sans date limite</p>}
+                    <p className="font-semibold text-slate-900">{reservation.first_name}</p>
+                    <a href={`mailto:${reservation.email}`} className="mt-1 inline-block text-xs text-slate-500 underline decoration-slate-300 underline-offset-2 hover:text-red-600">{reservation.email}</a>
                   </td>
                   <td className="px-4 py-4">
-                    <p className="mb-2 max-w-48 text-xs leading-5 text-slate-500">{reservation.payment_methods.join(", ") || "Moyen non indiqué"}</p>
                     <select
-                      aria-label={`Statut de paiement de ${reservation.first_name} ${reservation.last_name}`}
-                      value={reservation.payment_status}
+                      aria-label={`Niveau de français de ${reservation.first_name} ${reservation.last_name}`}
+                      value={frenchLevel}
                       disabled={isSaving}
-                      onChange={(event) => void updateReservation(reservation.id, { payment_status: event.target.value as PaymentStatus })}
+                      onChange={(event) => void updateReservation(reservation.id, { french_level: event.target.value, french_levels: event.target.value ? [event.target.value] : [] })}
                       className={selectClassName}
                     >
-                      <option value="pending">En attente de paiement</option>
-                      <option value="paid">Paiement effectué</option>
+                      <option value="">À préciser</option>
+                      {frenchLevels.map((level) => <option key={level} value={level}>{level}</option>)}
+                    </select>
+                  </td>
+                  <td className="px-4 py-4">
+                    <select
+                      aria-label={`Cours de ${reservation.first_name} ${reservation.last_name}`}
+                      value={reservation.course_type}
+                      disabled={isSaving}
+                      onChange={(event) => void updateReservation(reservation.id, { course_type: event.target.value as CourseType })}
+                      className={selectClassName}
+                    >
+                      <option value="individual">INDIVIDUEL</option>
+                      <option value="group">GROUPE</option>
+                      <option value="individual_group">INDIVIDUEL + GROUPE</option>
+                    </select>
+                  </td>
+                  <td className="min-w-56 px-4 py-4">
+                    <select
+                      aria-label={`Statut de ${reservation.first_name} ${reservation.last_name}`}
+                      value={reservation.student_status}
+                      disabled={isSaving}
+                      onChange={(event) => void updateReservation(reservation.id, { student_status: event.target.value as StudentStatus })}
+                      className={selectClassName}
+                    >
+                      <option value="waitlist">LISTE D’ATTENTE</option>
+                      <option value="to_validate">À VALIDER</option>
+                      <option value="payment_pending">ATTENTE DE RÈGLEMENT</option>
+                      <option value="enrolled">INSCRIT</option>
+                      <option value="paused">EN PAUSE</option>
+                      <option value="finished">FINI</option>
                     </select>
                   </td>
                   <td className="min-w-64 px-4 py-4">
-                    <select
-                      aria-label={`Statut du cours de ${reservation.first_name} ${reservation.last_name}`}
-                      value={reservation.course_status}
+                    <input
+                      aria-label={`Offre de ${reservation.first_name} ${reservation.last_name}`}
+                      defaultValue={reservation.offer}
                       disabled={isSaving}
-                      onChange={(event) => {
-                        const courseStatus = event.target.value as CourseStatus;
-                        if (courseStatus === "group_assigned" && !groupName.trim()) {
-                          setRowErrors((current) => ({ ...current, [reservation.id]: "Saisissez un nom de groupe avant l’affectation." }));
-                          return;
-                        }
-                        void updateReservation(reservation.id, {
-                          course_status: courseStatus,
-                          group_name: courseStatus === "group_assigned" ? groupName.trim() : null,
-                        });
+                      onBlur={(event) => {
+                        if (event.target.value !== reservation.offer) void updateReservation(reservation.id, { offer: event.target.value });
                       }}
                       className={selectClassName}
-                    >
-                      <option value="unassigned">À organiser</option>
-                      <option value="individual">Cours individuel</option>
-                      <option value="group_pending">En attente de constitution du groupe</option>
-                      <option value="group_assigned">Groupe assigné</option>
-                    </select>
-                    {(reservation.course_status === "group_pending" || reservation.course_status === "group_assigned") && (
-                      <input
-                        aria-label={`Nom du groupe de ${reservation.first_name} ${reservation.last_name}`}
-                        value={groupName}
-                        disabled={isSaving}
-                        onChange={(event) => setGroupDrafts((current) => ({ ...current, [reservation.id]: event.target.value }))}
-                        placeholder={reservation.course_status === "group_assigned" ? "Nom du groupe" : "Nom du futur groupe (facultatif)"}
-                        className={`${selectClassName} mt-2`}
-                      />
-                    )}
-                    {reservation.course_status === "group_assigned" && (
-                      <button
-                        type="button"
-                        disabled={isSaving || !groupName.trim()}
-                        onClick={() => void updateReservation(reservation.id, { course_status: "group_assigned", group_name: groupName.trim() })}
-                        className="mt-2 text-xs font-semibold text-red-700 underline decoration-red-300 underline-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                      >
-                        Enregistrer le groupe
-                      </button>
-                    )}
-                    {rowErrors[reservation.id] && <p role="alert" className="mt-2 text-xs font-semibold text-red-700">{rowErrors[reservation.id]}</p>}
+                    />
+                    <textarea
+                      aria-label={`Détails de l’offre de ${reservation.first_name} ${reservation.last_name}`}
+                      defaultValue={reservation.offer_details}
+                      rows={3}
+                      disabled={isSaving}
+                      onBlur={(event) => {
+                        if (event.target.value !== reservation.offer_details) void updateReservation(reservation.id, { offer_details: event.target.value });
+                      }}
+                      className={`${selectClassName} mt-2`}
+                    />
                   </td>
-                  <td className="max-w-64 whitespace-pre-wrap break-words px-4 py-4 text-slate-700">{reservation.comment || "—"}</td>
-                  <td className="whitespace-nowrap px-4 py-4 text-slate-600">
-                    {new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium" }).format(new Date(reservation.created_at))}
+                  <td className="min-w-56 px-4 py-4">
+                    <textarea
+                      aria-label={`Commentaire de ${reservation.first_name} ${reservation.last_name}`}
+                      defaultValue={reservation.comment}
+                      rows={3}
+                      disabled={isSaving}
+                      onBlur={(event) => {
+                        if (event.target.value !== reservation.comment) void updateReservation(reservation.id, { comment: event.target.value });
+                      }}
+                      className={selectClassName}
+                    />
                   </td>
                 </tr>
               );
             })}
             {reservations.length === 0 && (
               <tr>
-                <td colSpan={9} className="px-4 py-12 text-center text-slate-600">Aucune réservation pour le moment.</td>
+                <td colSpan={7} className="px-4 py-12 text-center text-slate-600">Aucun étudiant pour le moment.</td>
               </tr>
             )}
           </tbody>

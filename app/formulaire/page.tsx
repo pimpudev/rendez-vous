@@ -1,14 +1,16 @@
 import Link from "next/link";
 import ThemeToggle from "../theme-toggle";
-import ReservationForm from "./reservation-form";
+import ReservationForm from "./reservation-flow";
 
 export default async function ReservationPage({
   searchParams,
 }: {
-  searchParams: Promise<{ offre?: string | string[] }>;
+  searchParams: Promise<{ offre?: string | string[]; type?: string | string[] }>;
 }) {
-  const { offre } = await searchParams;
+  const { offre, type } = await searchParams;
   const selectedOffer = Array.isArray(offre) ? (offre[0] ?? "") : (offre ?? "");
+  const offerTypeValue = Array.isArray(type) ? type[0] : type;
+  const offerType = offerTypeValue === "group" ? "group" : "individual";
 
   return (
     <main className="site-shell min-h-screen bg-[linear-gradient(180deg,_#EAF3F8_0%,_#DDECF5_45%,_#C9DDEA_100%)] px-6 py-8 text-slate-800 lg:px-8">
@@ -35,7 +37,7 @@ export default async function ReservationPage({
           </p>
         </section>
 
-        <ReservationForm selectedOffer={selectedOffer} />
+        <ReservationForm selectedOffer={selectedOffer} offerType={offerType} />
       </div>
     </main>
   );

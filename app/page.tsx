@@ -69,10 +69,12 @@ const content = {
       "Très professionnelle, à l’écoute et exigeante dans le bon sens. J’ai vu une vraie progression en quelques mois.",
     ],
     faqTitle: "FAQ",
+    levelFaqTitle: "Quel est mon niveau de français ?",
     faq: [
       { question: "À qui s’adressent les cours ?", answer: "Les cours s’adressent aux adultes, étudiants et professionnels, quel que soit votre niveau." },
       { question: "Les cours sont-ils individuels ?", answer: "Oui, les cours sont personnalisés pour respecter votre rythme et vos objectifs." },
       { question: "Comment réserver un cours ?", answer: "Écrivez-moi pour échanger sur votre besoin et choisir le format qui vous convient." },
+      { question: "Quel est mon niveau de français ?", answer: "Choisissez le niveau qui correspond le mieux à vos acquis. Si vous hésitez, sélectionnez « Je ne connais pas mon niveau » dans le formulaire et nous vous aiderons à le déterminer." },
     ],
     ctaTitle: "Prêt(e) à faire passer votre français au niveau supérieur ?",
     ctaText: "Rendez votre objectif accessible avec un accompagnement humain et personnalisé.",
@@ -142,10 +144,12 @@ const content = {
       "Very professional, attentive, and demanding in the best way. I saw real progress in just a few months.",
     ],
     faqTitle: "FAQ",
+    levelFaqTitle: "What is my French level?",
     faq: [
       { question: "Who are the courses for?", answer: "The courses are for adults, students, and professionals at every level." },
       { question: "Are the courses individual?", answer: "Yes, each course is personalized to your pace and goals." },
       { question: "How do I book a lesson?", answer: "Send me a message to discuss your needs and choose the right format." },
+      { question: "What is my French level?", answer: "Choose the level that best matches your current French. If you are unsure, select “I don’t know my level” in the form and we will help you determine it." },
     ],
     ctaTitle: "Ready to move your French to the next level?",
     ctaText: "Turn your goal into a clear plan with human, personalized support.",
@@ -215,10 +219,12 @@ const content = {
       "Muy profesional, atenta y exigente en el buen sentido. Vi un progreso real en pocos meses.",
     ],
     faqTitle: "FAQ",
+    levelFaqTitle: "¿Cuál es mi nivel de francés?",
     faq: [
       { question: "¿A quién van dirigidos los cursos?", answer: "Los cursos están dirigidos a adultos, estudiantes y profesionales de cualquier nivel." },
       { question: "¿Son clases individuales?", answer: "Sí, cada clase se personaliza según tu ritmo y tus objetivos." },
       { question: "¿Cómo reservar una clase?", answer: "Escríbeme para hablar de tus necesidades y elegir el formato adecuado." },
+      { question: "¿Cuál es mi nivel de francés?", answer: "Elige el nivel que mejor corresponda a tus conocimientos. Si tienes dudas, selecciona « No conozco mi nivel » en el formulario y te ayudaremos a determinarlo." },
     ],
     ctaTitle: "¿Listo para llevar tu francés al siguiente nivel?",
     ctaText: "Haz que tu objetivo sea alcanzable con un acompañamiento humano y personalizado.",
@@ -449,7 +455,7 @@ export default function Home() {
 
             <div className="mt-12 space-y-4">
               {t.faq.map((item) => (
-                <details key={item.question} className="rounded-2xl border border-slate-200 bg-slate-50 p-5 shadow-sm">
+                <details id={item.question === t.levelFaqTitle ? "faq-niveau-francais" : undefined} key={item.question} className="rounded-2xl border border-slate-200 bg-slate-50 p-5 shadow-sm">
                   <summary className="cursor-pointer font-semibold text-slate-900">{item.question}</summary>
                   <p className="mt-3 leading-7 text-slate-600">{item.answer}</p>
                 </details>
