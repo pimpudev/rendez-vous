@@ -392,7 +392,7 @@ export default function Home() {
                   {block.items.map((offer) => (
                     <Link key={offer.slug} href={`/offres/${offer.slug}`} className="group flex min-h-[300px] flex-col bg-white px-6 py-7 transition-colors hover:bg-slate-50 focus-visible:relative focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-red-600">
                         <h4 className="min-h-[4.5rem] text-lg font-bold leading-6 text-slate-900">{offer.name}</h4>
-                        <p className="mt-5 text-lg font-black leading-7 text-slate-900">{offer.price}</p>
+                        <p className="mt-5 text-sm font-normal leading-6 text-slate-600">{offer.price}</p>
                         <span className="mt-auto inline-flex min-h-10 items-center justify-center rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition-colors group-hover:bg-red-600">
                           {t.offerLinkLabel}
                         </span>
