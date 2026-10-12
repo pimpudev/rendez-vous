@@ -3,14 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import ThemeToggle from "./theme-toggle";
-
-type Language = "fr" | "en" | "es";
-
-const languageOptions = {
-  fr: { label: "Français" },
-  en: { label: "English" },
-  es: { label: "Español" },
-} satisfies Record<Language, { label: string }>;
+import { LanguageSelector, useSiteLanguage, type SiteLanguage } from "./site-language";
 
 const content = {
   fr: {
@@ -260,7 +253,7 @@ function renderTeacherBio(text: string, teacherName: string) {
 }
 
 export default function Home() {
-  const [lang, setLang] = useState<Language>("fr");
+  const lang: SiteLanguage = useSiteLanguage();
   const [introVisible, setIntroVisible] = useState(true);
   const [introLeaving, setIntroLeaving] = useState(false);
   const t = content[lang];
@@ -296,27 +289,13 @@ export default function Home() {
       <header inert={introVisible} aria-hidden={introVisible} className="mx-auto max-w-6xl px-6 py-6 lg:px-8">
         <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-y-2 rounded-full bg-white px-3 py-3 shadow-sm sm:gap-y-0 sm:px-4">
           <div className="col-start-1 row-start-1 justify-self-start">
-            <ThemeToggle language={lang} />
+            <ThemeToggle />
           </div>
           <Link href="#programs" className="col-span-3 row-start-2 justify-self-center whitespace-nowrap rounded-full bg-slate-900 px-2 py-2 text-[11px] font-medium text-white transition hover:bg-slate-700 sm:col-span-1 sm:col-start-2 sm:row-start-1 sm:px-4 sm:text-sm">
             {t.primaryCta}
           </Link>
-          <div className="col-start-3 row-start-1 inline-flex min-w-0 justify-self-end rounded-full border border-slate-200 bg-slate-100 p-1">
-            {(["fr", "en", "es"] as const).map((option) => (
-              <button
-                key={option}
-                type="button"
-                onClick={() => setLang(option)}
-                aria-pressed={lang === option}
-                aria-label={languageOptions[option].label}
-                title={languageOptions[option].label}
-                className={`inline-flex h-7 items-center justify-center rounded-full px-1.5 text-[10px] font-semibold transition sm:h-8 sm:px-2.5 sm:text-xs ${
-                  lang === option ? "bg-white text-slate-900 shadow-sm" : "text-slate-500"
-                }`}
-              >
-                <span>{option.toUpperCase()}</span>
-              </button>
-            ))}
+          <div className="col-start-3 row-start-1 justify-self-end">
+            <LanguageSelector />
           </div>
         </div>
       </header>

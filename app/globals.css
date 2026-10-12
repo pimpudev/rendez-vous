@@ -246,6 +246,13 @@ button {
   font-weight: 700;
 }
 
+.theme-control {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.3rem;
+}
+
 .theme-toggle {
   display: inline-flex;
   width: 2.5rem;

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ThemeToggle from "../../theme-toggle";
+import { LanguageSelector } from "../../site-language";
 
 const offers = {
   "individuel-professionnel": {
@@ -90,16 +91,19 @@ export default async function OfferPage({
   return (
     <main className="site-shell min-h-screen bg-[linear-gradient(180deg,_#EAF3F8_0%,_#DDECF5_45%,_#C9DDEA_100%)] px-6 py-8 text-slate-800 lg:px-8">
       <div className="mx-auto max-w-6xl">
-        <header className="flex items-center justify-between rounded-full bg-white px-5 py-3 shadow-sm">
+        <header className="flex flex-wrap items-center justify-between gap-3 rounded-full bg-white px-4 py-3 shadow-sm sm:px-5">
           <div className="flex items-center gap-3">
             <Link href="/" className="font-bold text-slate-900 transition hover:text-red-600">
               Rendez-Vous
             </Link>
             <ThemeToggle />
           </div>
-          <Link href="/#programs" className="text-sm font-semibold text-slate-700 transition hover:text-red-600">
-            Toutes les offres
-          </Link>
+          <div className="ml-auto flex items-center gap-2">
+            <LanguageSelector />
+            <Link href="/#programs" className="text-sm font-semibold text-slate-700 transition hover:text-red-600">
+              Toutes les offres
+            </Link>
+          </div>
         </header>
 
         <section className="mx-auto max-w-5xl px-2 pb-14 pt-16 text-center sm:pt-20">

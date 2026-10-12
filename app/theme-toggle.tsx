@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Moon, Sun } from "lucide-react";
+import { useSiteLanguage } from "./site-language";
 
 const themeStorageKey = "rendez-vous-theme";
 
@@ -25,8 +27,9 @@ const labels = {
   },
 } as const;
 
-export default function ThemeToggle({ language = "fr" }: { language?: keyof typeof labels }) {
+export default function ThemeToggle() {
   const [isDark, setIsDark] = useState(false);
+  const language = useSiteLanguage();
   const text = labels[language];
 
   useEffect(() => {
@@ -52,16 +55,20 @@ export default function ThemeToggle({ language = "fr" }: { language?: keyof type
   }
 
   return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={isDark}
-      aria-label={isDark ? text.lightMode : text.darkMode}
-      title={isDark ? text.activateLight : text.activateDark}
-      onClick={toggleTheme}
-      className="theme-toggle"
-    >
-      <span className="theme-toggle-thumb" />
-    </button>
+    <div className="theme-control">
+      <Sun aria-hidden="true" size={15} strokeWidth={1.8} className="text-slate-500" />
+      <button
+        type="button"
+        role="switch"
+        aria-checked={isDark}
+        aria-label={isDark ? text.lightMode : text.darkMode}
+        title={isDark ? text.activateLight : text.activateDark}
+        onClick={toggleTheme}
+        className="theme-toggle"
+      >
+        <span className="theme-toggle-thumb" />
+      </button>
+      <Moon aria-hidden="true" size={15} strokeWidth={1.8} className="text-slate-500" />
+    </div>
   );
 }
