@@ -6,6 +6,7 @@ import Link from "next/link";
 import { getSupabaseClient } from "../../lib/supabase";
 
 type CourseType = "individual" | "group" | "individual_group";
+type AssignmentStatus = "unassigned" | "individual_assigned" | "group_assigned";
 type StudentStatus = "waitlist" | "to_validate" | "payment_pending" | "enrolled" | "paused" | "finished";
 type AccessStatus = "checking" | "demo" | "signed-out" | "denied" | "ready" | "error";
 
@@ -18,6 +19,7 @@ type Reservation = {
   french_levels: string[];
   registration_type: 1 | 2 | 3;
   course_type: CourseType;
+  assignment_status: AssignmentStatus;
   student_status: StudentStatus;
   offer: string;
   offer_details: string;
@@ -28,19 +30,32 @@ type Reservation = {
   created_at: string;
 };
 
+type FollowedCourse = {
+  id: string;
+  student_email: string;
+  first_name: string;
+  last_name: string;
+  course_type: "individual" | "group";
+  offer: string;
+  offer_details: string;
+  availability_slots: string[];
+  selected_group_id: string | null;
+  comment: string;
+  created_at: string;
+};
+
 type StudentRow = {
   key: string;
   first_name: string;
   last_name: string;
   email: string;
-  french_levels: string[];
-  course_type: CourseType;
   is_demo: boolean;
   registrations: Reservation[];
+  followed_courses: FollowedCourse[];
 };
 
 type AdminLoadResult =
-  | { status: "ready"; reservations: Reservation[] }
+  | { status: "ready"; reservations: Reservation[]; followedCourses: FollowedCourse[] }
   | { status: "denied" }
   | { status: "error"; message: string };
 
@@ -53,6 +68,7 @@ const demoReservation: Reservation = {
   french_levels: ["B1"],
   registration_type: 3,
   course_type: "group",
+  assignment_status: "unassigned",
   student_status: "waitlist",
   offer: "OFFRE DE COURS GROUPÉ XYZ",
   offer_details: "Disponibilités : samedi 10:00–11:00, samedi 11:00–12:00",
@@ -68,6 +84,7 @@ const demoIndividualReservation: Reservation = {
   id: "demo-reservation-002",
   registration_type: 1,
   course_type: "individual",
+  assignment_status: "unassigned",
   student_status: "to_validate",
   offer: "Professionnel – 1 à 4 compétences",
   offer_details: "Disponibilités : mardi 14:00–15:00",
@@ -100,58 +117,101 @@ async function loadAdminReservations(
     return { status: "error", message: "Impossible de charger les réservations. Vérifiez le schéma Supabase." };
   }
 
-  return { status: "ready", reservations: (data ?? []) as Reservation[] };
+  const { data: followedCourses, error: coursesError } = await supabase
+    .from("student_courses")
+    .select("id, student_email, first_name, last_name, course_type, offer, offer_details, availability_slots, selected_group_id, comment, created_at")
+    .order("created_at", { ascending: false });
+
+  if (coursesError) {
+    return { status: "error", message: "Impossible de charger les offres suivies. Appliquez la migration Supabase des inscriptions finalisées." };
+  }
+
+  return {
+    status: "ready",
+    reservations: (data ?? []) as Reservation[],
+    followedCourses: (followedCourses ?? []) as FollowedCourse[],
+  };
 }
 
 const selectClassName =
   "min-h-10 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-200";
-const frenchLevels = [
-  { value: "COMPLETE BEGINNER", label: "Débutant complet" },
-  { value: "A1", label: "A1" },
-  { value: "A2", label: "A2" },
-  { value: "B1", label: "B1" },
-  { value: "B2", label: "B2" },
-  { value: "C1", label: "C1" },
-  { value: "C2", label: "C2" },
-];
+function getRequestLabel(registration: Reservation) {
+  if (registration.registration_type === 1) return "Réservation de créneaux individuels";
+  if (registration.registration_type === 2) return "Demande pour rejoindre un groupe existant";
+  return "Demande de création d’un groupe";
+}
 
-function groupStudentReservations(reservations: Reservation[]): StudentRow[] {
-  const grouped = new Map<string, Reservation[]>();
+function getFrenchLevelLabel(registration: Reservation) {
+  const levels = registration.french_level
+    ? [registration.french_level]
+    : registration.french_levels;
 
-  for (const reservation of reservations) {
-    const key = reservation.email.trim().toLocaleLowerCase();
-    const existing = grouped.get(key) ?? [];
-    existing.push(reservation);
-    grouped.set(key, existing);
+  if (levels.length === 0) return "Non renseigné";
+  return levels.map((level) => level === "COMPLETE BEGINNER" ? "Débutant complet" : level).join(", ");
+}
+
+function getRequestSchedule(registration: Reservation) {
+  if (registration.availability_slots.length > 0) return registration.availability_slots.join(" · ");
+  return registration.offer_details.replace(/^Disponibilités\s*:\s*/i, "").trim();
+}
+
+function getRequestStatusOptions(registration: Reservation) {
+  const options: { value: StudentStatus; label: string; disabled?: boolean }[] = [
+    { value: "to_validate", label: "En attente de validation" },
+    { value: "payment_pending", label: "En attente de règlement" },
+    { value: "paused", label: "En pause" },
+  ];
+
+  if (registration.registration_type === 3) {
+    options.unshift({ value: "waitlist", label: "En attente de création" });
   }
 
-  return [...grouped.entries()].map(([key, registrations]) => {
-    const storedCourseTypes = [...new Set(registrations.map((registration) => registration.course_type))];
-    const hasIndividual = registrations.some((registration) =>
-      registration.registration_type === 1 || registration.course_type === "individual" || registration.course_type === "individual_group",
-    );
-    const hasGroup = registrations.some((registration) =>
-      registration.registration_type === 2 || registration.registration_type === 3 || registration.course_type === "group" || registration.course_type === "individual_group",
-    );
-    const courseType = storedCourseTypes.length === 1
-      ? storedCourseTypes[0]
-      : hasIndividual && hasGroup
-        ? "individual_group"
-        : hasGroup
-          ? "group"
-          : "individual";
-
-    return {
-      key,
-      first_name: registrations[0].first_name,
-      last_name: registrations[0].last_name,
-      email: registrations[0].email,
-      french_levels: [...new Set(registrations.map((registration) => registration.french_level).filter((level): level is string => Boolean(level)))],
-      course_type: courseType,
-      is_demo: registrations.some((registration) => registration.is_demo),
-      registrations,
+  if (!options.some((option) => option.value === registration.student_status)) {
+    const legacyStatusLabels: Record<StudentStatus, string> = {
+      waitlist: "En attente de création (ancien statut)",
+      to_validate: "En attente de validation",
+      payment_pending: "En attente de règlement",
+      enrolled: "Inscrit (ancien statut)",
+      paused: "En pause",
+      finished: "Terminé (ancien statut)",
     };
-  });
+    options.unshift({ value: registration.student_status, label: legacyStatusLabels[registration.student_status], disabled: true });
+  }
+
+  return options;
+}
+
+function groupStudentReservations(reservations: Reservation[], followedCourses: FollowedCourse[]): StudentRow[] {
+  const grouped = new Map<string, StudentRow>();
+  const getStudent = (email: string, firstName: string, lastName: string, isDemo: boolean) => {
+    const key = email.trim().toLocaleLowerCase();
+    let student = grouped.get(key);
+    if (!student) {
+      student = {
+        key,
+        first_name: firstName,
+        last_name: lastName,
+        email,
+        is_demo: isDemo,
+        registrations: [],
+        followed_courses: [],
+      };
+      grouped.set(key, student);
+    }
+    return student;
+  };
+
+  for (const reservation of reservations) {
+    getStudent(reservation.email, reservation.first_name, reservation.last_name, reservation.is_demo)
+      .registrations.push(reservation);
+  }
+
+  for (const course of followedCourses) {
+    getStudent(course.student_email, course.first_name, course.last_name, false)
+      .followed_courses.push(course);
+  }
+
+  return [...grouped.values()];
 }
 
 export default function AdminDashboard() {
@@ -161,11 +221,15 @@ export default function AdminDashboard() {
   const [reservations, setReservations] = useState<Reservation[]>(() =>
     getSupabaseClient() ? [] : [demoIndividualReservation, demoReservation],
   );
+  const [followedCourses, setFollowedCourses] = useState<FollowedCourse[]>([]);
+  const [studentNotes, setStudentNotes] = useState<Record<string, string>>({});
+  const [savedStudentNotes, setSavedStudentNotes] = useState<Record<string, string>>({});
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState("");
   const [saveError, setSaveError] = useState("");
   const [savingId, setSavingId] = useState<string | null>(null);
+  const [savingNoteEmail, setSavingNoteEmail] = useState<string | null>(null);
 
   useEffect(() => {
     const supabase = getSupabaseClient();
@@ -214,6 +278,20 @@ export default function AdminDashboard() {
     }
 
     setReservations(result.reservations);
+    setFollowedCourses(result.followedCourses);
+
+    const { data: noteData, error: notesError } = await supabase
+      .from("admin_student_notes")
+      .select("student_email, note");
+    if (notesError) {
+      setSaveError("Les notes étudiant ne sont pas disponibles. Appliquez la migration Supabase des notes admin.");
+    } else {
+      const notes = Object.fromEntries((noteData ?? []).map((item) => [item.student_email, item.note])) as Record<string, string>;
+      setStudentNotes(notes);
+      setSavedStudentNotes(notes);
+      setSaveError("");
+    }
+
     setAccessStatus("ready");
   }
 
@@ -239,7 +317,7 @@ export default function AdminDashboard() {
 
   async function updateReservation(
     reservationId: string,
-    updates: Partial<Pick<Reservation, "french_level" | "french_levels" | "course_type" | "student_status" | "offer" | "offer_details" | "comment">>,
+    updates: Partial<Pick<Reservation, "student_status">>,
   ) {
     if (accessStatus === "demo") {
       setReservations((current) => current.map((reservation) =>
@@ -273,54 +351,96 @@ export default function AdminDashboard() {
     ));
   }
 
-  async function updateStudentRegistrations(
-    student: StudentRow,
-    updates: Partial<Pick<Reservation, "french_level" | "french_levels" | "course_type">>,
-  ) {
-    const reservationIds = student.registrations.map((registration) => registration.id);
+  async function saveStudentNote(email: string, note: string) {
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedNote = note.trim();
+    if (savedStudentNotes[normalizedEmail] === normalizedNote) return;
 
     if (accessStatus === "demo") {
-      setReservations((current) => current.map((reservation) =>
-        reservationIds.includes(reservation.id) ? { ...reservation, ...updates } : reservation,
-      ));
+      setStudentNotes((current) => ({ ...current, [normalizedEmail]: normalizedNote }));
+      setSavedStudentNotes((current) => ({ ...current, [normalizedEmail]: normalizedNote }));
       return;
     }
 
     const supabase = getSupabaseClient();
     if (!supabase) return;
 
-    const savingKey = `student:${student.key}`;
-    setSavingId(savingKey);
+    setSavingNoteEmail(normalizedEmail);
     setSaveError("");
+    const { error } = await supabase
+      .from("admin_student_notes")
+      .upsert({ student_email: normalizedEmail, note: normalizedNote, updated_at: new Date().toISOString() }, { onConflict: "student_email" });
 
-    const { data, error } = await supabase
-      .from("reservations")
-      .update(updates)
-      .in("id", reservationIds)
-      .select("*");
-
-    setSavingId(null);
-
+    setSavingNoteEmail(null);
     if (error) {
-      setSaveError("Modification non enregistrée. Vérifiez votre connexion puis réessayez.");
+      setSaveError("Note non enregistrée. Vérifiez que la migration Supabase des notes admin est appliquée.");
       return;
     }
 
-    const updatedById = new Map(((data ?? []) as Reservation[]).map((reservation) => [reservation.id, reservation]));
-    setReservations((current) => current.map((reservation) => updatedById.get(reservation.id) ?? reservation));
+    setStudentNotes((current) => ({ ...current, [normalizedEmail]: normalizedNote }));
+    setSavedStudentNotes((current) => ({ ...current, [normalizedEmail]: normalizedNote }));
+  }
+
+  async function finalizeRegistration(student: StudentRow, registration: Reservation) {
+    const confirmed = window.confirm(
+      `Finaliser l’inscription de ${student.first_name} ${student.last_name} à « ${registration.offer} » ? La demande sera retirée et l’offre ajoutée aux offres suivies.`,
+    );
+    if (!confirmed) return;
+
+    if (accessStatus === "demo") {
+      const followedCourse: FollowedCourse = {
+        id: `demo-course-${registration.id}`,
+        student_email: student.email.trim().toLowerCase(),
+        first_name: student.first_name,
+        last_name: student.last_name,
+        course_type: registration.registration_type === 1 ? "individual" : "group",
+        offer: registration.offer,
+        offer_details: registration.offer_details,
+        availability_slots: registration.availability_slots,
+        selected_group_id: registration.selected_group_id,
+        comment: registration.comment,
+        created_at: new Date().toISOString(),
+      };
+      setFollowedCourses((current) => [...current, followedCourse]);
+      setReservations((current) => current.filter((item) => item.id !== registration.id));
+      return;
+    }
+
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+
+    setSavingId(registration.id);
+    setSaveError("");
+    const { data, error } = await supabase.rpc("finalize_reservation", { p_reservation_id: registration.id });
+    setSavingId(null);
+
+    if (error) {
+      setSaveError("Finalisation impossible. Vérifiez que la migration Supabase des inscriptions finalisées est appliquée.");
+      return;
+    }
+
+    const { data: sessionData } = await supabase.auth.getSession();
+    if (sessionData.session) {
+      await refreshAdminData(supabase, sessionData.session.user.id);
+    } else {
+      setSaveError("Inscription finalisée, mais la liste n’a pas pu être actualisée. Rechargez la page.");
+    }
   }
 
   async function deleteStudent(student: StudentRow) {
-    const registrationIds = student.registrations.map((registration) => registration.id);
-    const registrationLabel = registrationIds.length > 1 ? "inscriptions" : "inscription";
+    const recordCount = student.registrations.length + student.followed_courses.length;
+    const recordLabel = recordCount > 1 ? "cours et demandes" : "cours ou demande";
     const confirmed = window.confirm(
-      `Supprimer ${student.first_name} ${student.last_name} et ses ${registrationIds.length} ${registrationLabel} ? Cette action est définitive.`,
+      `Supprimer ${student.first_name} ${student.last_name}, sa note et ses ${recordCount} ${recordLabel} ? Cette action est définitive.`,
     );
 
     if (!confirmed) return;
 
     if (accessStatus === "demo") {
-      setReservations((current) => current.filter((reservation) => !registrationIds.includes(reservation.id)));
+      setReservations((current) => current.filter((reservation) => reservation.email.trim().toLowerCase() !== student.key));
+      setFollowedCourses((current) => current.filter((course) => course.student_email !== student.key));
+      setStudentNotes((current) => Object.fromEntries(Object.entries(current).filter(([email]) => email !== student.key)));
+      setSavedStudentNotes((current) => Object.fromEntries(Object.entries(current).filter(([email]) => email !== student.key)));
       return;
     }
 
@@ -331,19 +451,19 @@ export default function AdminDashboard() {
     setSavingId(savingKey);
     setSaveError("");
 
-    const { error } = await supabase
-      .from("reservations")
-      .delete()
-      .in("id", registrationIds);
+    const { error } = await supabase.rpc("delete_student_records", { p_student_email: student.key });
 
     setSavingId(null);
 
     if (error) {
-      setSaveError("Suppression non effectuée. Vérifiez vos droits administrateur puis réessayez.");
+      setSaveError("Suppression non effectuée. Vérifiez que la migration Supabase des cours suivis est appliquée, puis réessayez.");
       return;
     }
 
-    setReservations((current) => current.filter((reservation) => !registrationIds.includes(reservation.id)));
+    setReservations((current) => current.filter((reservation) => reservation.email.trim().toLowerCase() !== student.key));
+    setFollowedCourses((current) => current.filter((course) => course.student_email !== student.key));
+    setStudentNotes((current) => Object.fromEntries(Object.entries(current).filter(([email]) => email !== student.key)));
+    setSavedStudentNotes((current) => Object.fromEntries(Object.entries(current).filter(([email]) => email !== student.key)));
   }
 
   async function deleteRegistration(student: StudentRow, registration: Reservation) {
@@ -432,9 +552,8 @@ export default function AdminDashboard() {
     );
   }
 
-  const students = groupStudentReservations(reservations);
-  const toValidate = students.filter((student) => student.registrations.some((registration) => registration.student_status === "to_validate")).length;
-  const waitingList = students.filter((student) => student.registrations.some((registration) => registration.student_status === "waitlist")).length;
+  const students = groupStudentReservations(reservations, followedCourses);
+  const requestsInProgress = reservations.filter((registration) => registration.student_status !== "enrolled" && registration.student_status !== "finished").length;
 
   return (
     <section className="mx-auto mb-16 max-w-6xl">
@@ -457,18 +576,14 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      <div className="mb-6 grid gap-4 sm:grid-cols-3">
+      <div className="mb-6 grid gap-4 sm:grid-cols-2">
         <div className="rounded-xl border border-slate-200 bg-white p-5">
-          <p className="text-sm text-slate-600">Clients</p>
+          <p className="text-sm text-slate-600">Étudiants</p>
           <p className="mt-1 text-2xl font-bold text-slate-900">{students.length}</p>
         </div>
         <div className="rounded-xl border border-slate-200 bg-white p-5">
-          <p className="text-sm text-slate-600">À valider</p>
-          <p className="mt-1 text-2xl font-bold text-slate-900">{toValidate}</p>
-        </div>
-        <div className="rounded-xl border border-slate-200 bg-white p-5">
-          <p className="text-sm text-slate-600">Liste d’attente</p>
-          <p className="mt-1 text-2xl font-bold text-slate-900">{waitingList}</p>
+          <p className="text-sm text-slate-600">Demandes en cours</p>
+          <p className="mt-1 text-2xl font-bold text-slate-900">{requestsInProgress}</p>
         </div>
       </div>
 
@@ -480,21 +595,17 @@ export default function AdminDashboard() {
             <tr>
               <th scope="col" className="px-4 py-3">Nom</th>
               <th scope="col" className="px-4 py-3">Prénom</th>
-              <th scope="col" className="px-4 py-3">Niveau</th>
-              <th scope="col" className="px-4 py-3">Cours</th>
-              <th scope="col" className="px-4 py-3">Statut</th>
-              <th scope="col" className="px-4 py-3">Offre</th>
-              <th scope="col" className="px-4 py-3">Commentaire</th>
+              <th scope="col" className="px-4 py-3">Demandes de réservation</th>
+              <th scope="col" className="px-4 py-3">Offres suivies</th>
+              <th scope="col" className="px-4 py-3">Note étudiant</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200">
             {students.map((student) => {
               const isSaving = savingId === `student:${student.key}` || student.registrations.some((registration) => savingId === registration.id);
-              const frenchLevel = student.french_levels.length === 0
-                ? ""
-                : student.french_levels.length === 1
-                  ? student.french_levels[0]
-                  : "multiple";
+              const isSavingNote = savingNoteEmail === student.key;
+              const pendingRequests = student.registrations.filter((registration) => registration.student_status !== "enrolled" && registration.student_status !== "finished");
+              const followedOffers = student.followed_courses;
 
               return (
                 <tr key={student.key} className="align-top">
@@ -514,117 +625,105 @@ export default function AdminDashboard() {
                     <p className="font-semibold text-slate-900">{student.first_name}</p>
                     <a href={`mailto:${student.email}`} className="mt-1 inline-block text-xs text-slate-500 underline decoration-slate-300 underline-offset-2 hover:text-red-600">{student.email}</a>
                   </td>
-                  <td className="px-4 py-4">
-                    <select
-                      aria-label={`Niveau de français de ${student.first_name} ${student.last_name}`}
-                      value={frenchLevel}
-                      disabled={isSaving}
-                      onChange={(event) => void updateStudentRegistrations(student, { french_level: event.target.value, french_levels: event.target.value && event.target.value !== "multiple" ? [event.target.value] : [] })}
-                      className={selectClassName}
-                    >
-                      <option value="">À préciser</option>
-                      {frenchLevel === "multiple" && <option value="multiple" disabled>Plusieurs niveaux</option>}
-                      {frenchLevels.map((level) => <option key={level.value} value={level.value}>{level.label}</option>)}
-                    </select>
-                  </td>
-                  <td className="px-4 py-4">
-                    <select
-                      aria-label={`Cours de ${student.first_name} ${student.last_name}`}
-                      value={student.course_type}
-                      disabled={isSaving}
-                      onChange={(event) => void updateStudentRegistrations(student, { course_type: event.target.value as CourseType })}
-                      className={selectClassName}
-                    >
-                      <option value="individual">INDIVIDUEL</option>
-                      <option value="group">GROUPE</option>
-                      <option value="individual_group">INDIVIDUEL + GROUPE</option>
-                    </select>
-                  </td>
                   <td className="min-w-64 px-4 py-4">
                     <div className="space-y-4">
-                      {student.registrations.map((registration) => (
-                        <div key={registration.id} className="border-b border-slate-200 pb-3 last:border-0 last:pb-0">
-                          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                            {registration.offer} · {registration.course_type === "individual" ? "Cours individuel" : "Cours groupe"}
-                          </p>
-                          <select
-                            aria-label={`Statut du cours ${registration.offer} de ${student.first_name} ${student.last_name}`}
-                            value={registration.student_status}
-                            disabled={isSaving}
-                            onChange={(event) => void updateReservation(registration.id, { student_status: event.target.value as StudentStatus })}
-                            className={selectClassName}
-                          >
-                            <option value="waitlist">LISTE D’ATTENTE</option>
-                            <option value="to_validate">À VALIDER</option>
-                            <option value="payment_pending">ATTENTE DE RÈGLEMENT</option>
-                            <option value="enrolled">INSCRIT</option>
-                            <option value="paused">EN PAUSE</option>
-                            <option value="finished">FINI</option>
-                          </select>
+                      {pendingRequests.length === 0 && <p className="text-sm text-slate-500">Aucune demande en attente.</p>}
+                      {pendingRequests.map((registration) => (
+                        <div key={registration.id} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                          <span className={`inline-flex rounded-full px-2 py-1 text-[11px] font-bold ${registration.registration_type === 1 ? "bg-blue-100 text-blue-800" : "bg-red-100 text-red-800"}`}>
+                            {registration.registration_type === 1 ? "INDIVIDUEL" : "GROUPE"}
+                          </span>
+                          <h4 className="mt-2 text-base font-bold text-slate-900">{registration.offer}</h4>
+                          {registration.registration_type !== 1 && <p className="mt-1 text-sm font-semibold text-slate-700">{getRequestLabel(registration)}</p>}
+                          <div className="mb-3 rounded-md bg-white px-3 py-2">
+                            <p className="text-xs font-semibold text-slate-500">Créneau horaire</p>
+                            <p className="mt-1 whitespace-pre-wrap text-sm font-medium text-slate-800">{getRequestSchedule(registration) || "À préciser"}</p>
+                          </div>
+                          <div className="mb-3 rounded-md bg-white px-3 py-2">
+                            <p className="text-xs font-semibold text-slate-500">Niveau de français sélectionné</p>
+                            <p className="mt-1 text-sm font-medium text-slate-800">{getFrenchLevelLabel(registration)}</p>
+                          </div>
+                          {registration.comment.trim() && (
+                            <div className="mb-3 rounded-md bg-white px-3 py-2">
+                              <p className="text-xs font-semibold text-slate-500">Commentaire de l’étudiant</p>
+                              <p className="mt-1 whitespace-pre-wrap text-sm font-medium text-slate-800">{registration.comment}</p>
+                            </div>
+                          )}
+                          <label className="block text-xs font-semibold text-slate-600">
+                            Statut de la demande
+                            <select
+                              aria-label={`Statut de la demande ${registration.offer} de ${student.first_name} ${student.last_name}`}
+                              value={registration.student_status}
+                              disabled={isSaving}
+                              onChange={(event) => void updateReservation(registration.id, { student_status: event.target.value as StudentStatus })}
+                              className={`${selectClassName} mt-1`}
+                            >
+                              {getRequestStatusOptions(registration).map((option) => (
+                                <option key={option.value} value={option.value} disabled={option.disabled}>{option.label}</option>
+                              ))}
+                            </select>
+                          </label>
+                          <div className="mt-3 grid gap-2">
+                            {(
+                              <button
+                                type="button"
+                                disabled={isSaving}
+                                onClick={() => void finalizeRegistration(student, registration)}
+                                className="min-h-10 rounded-lg bg-emerald-600 px-3 py-2 text-xs font-bold text-white transition hover:bg-emerald-700 disabled:cursor-wait disabled:opacity-50"
+                              >
+                                Finaliser l’inscription
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              disabled={isSaving}
+                              onClick={() => void deleteRegistration(student, registration)}
+                              className="min-h-10 rounded-lg border border-red-200 px-3 py-2 text-xs font-bold text-red-700 transition hover:bg-red-50 disabled:cursor-wait disabled:opacity-50"
+                            >
+                              Supprimer la demande
+                            </button>
+                          </div>
                         </div>
                       ))}
                     </div>
                   </td>
                   <td className="min-w-72 px-4 py-4">
                     <div className="space-y-4">
-                      {student.registrations.map((registration) => (
-                        <div key={registration.id} className="border-b border-slate-200 pb-3 last:border-0 last:pb-0">
-                          <input
-                            aria-label={`Offre de ${student.first_name} ${student.last_name} : ${registration.offer}`}
-                            defaultValue={registration.offer}
-                            disabled={isSaving}
-                            onBlur={(event) => {
-                              if (event.target.value !== registration.offer) void updateReservation(registration.id, { offer: event.target.value });
-                            }}
-                            className={selectClassName}
-                          />
-                          <textarea
-                            aria-label={`Détails de l’offre ${registration.offer} de ${student.first_name} ${student.last_name}`}
-                            defaultValue={registration.offer_details}
-                            rows={3}
-                            disabled={isSaving}
-                            onBlur={(event) => {
-                              if (event.target.value !== registration.offer_details) void updateReservation(registration.id, { offer_details: event.target.value });
-                            }}
-                            className={`${selectClassName} mt-2`}
-                          />
-                          <button
-                            type="button"
-                            disabled={isSaving}
-                            onClick={() => void deleteRegistration(student, registration)}
-                            className="mt-2 block text-xs font-semibold text-red-700 underline decoration-red-300 underline-offset-2 disabled:cursor-wait disabled:opacity-50"
-                          >
-                            Supprimer ce cours
-                          </button>
+                      {followedOffers.length === 0 && <p className="text-sm text-slate-500">Aucune offre finalisée.</p>}
+                      {followedOffers.map((course) => (
+                        <div key={course.id} className="border-b border-slate-200 pb-3 last:border-0 last:pb-0">
+                          <p className="font-semibold text-slate-900">{course.offer} · {course.course_type === "individual" ? "Individuel" : "Groupe"}</p>
+                          <p className="mt-1 text-sm leading-6 text-slate-600">
+                            {course.availability_slots.length > 0
+                              ? course.availability_slots.join(" · ")
+                              : course.offer_details || "Créneau à préciser"}
+                          </p>
+                          {course.comment.trim() && <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-600">{course.comment}</p>}
                         </div>
                       ))}
                     </div>
                   </td>
                   <td className="min-w-56 px-4 py-4">
-                    <div className="space-y-4">
-                      {student.registrations.map((registration) => (
-                        <div key={registration.id} className="border-b border-slate-200 pb-3 last:border-0 last:pb-0">
-                          <p className="mb-2 text-xs font-semibold text-slate-600">{registration.offer}</p>
-                          <textarea
-                            aria-label={`Commentaire de l’offre ${registration.offer} de ${student.first_name} ${student.last_name}`}
-                            defaultValue={registration.comment}
-                            rows={3}
-                            disabled={isSaving}
-                            onBlur={(event) => {
-                              if (event.target.value !== registration.comment) void updateReservation(registration.id, { comment: event.target.value });
-                            }}
-                            className={selectClassName}
-                          />
-                        </div>
-                      ))}
-                    </div>
+                    <label className="block text-xs font-semibold text-slate-600">
+                      Note interne sur l’étudiant
+                      <textarea
+                        aria-label={`Note étudiant ${student.first_name} ${student.last_name}`}
+                        value={studentNotes[student.key] ?? ""}
+                        rows={4}
+                        disabled={isSavingNote}
+                        onChange={(event) => setStudentNotes((current) => ({ ...current, [student.key]: event.target.value }))}
+                        onBlur={(event) => void saveStudentNote(student.email, event.currentTarget.value)}
+                        className={`${selectClassName} mt-2`}
+                      />
+                    </label>
+                    {isSavingNote && <p role="status" className="mt-1 text-xs text-slate-500">Enregistrement…</p>}
                   </td>
                 </tr>
               );
             })}
             {students.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-12 text-center text-slate-600">Aucun étudiant pour le moment.</td>
+                <td colSpan={5} className="px-4 py-12 text-center text-slate-600">Aucun étudiant pour le moment.</td>
               </tr>
             )}
           </tbody>
