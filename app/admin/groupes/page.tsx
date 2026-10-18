@@ -7,8 +7,7 @@ export default function GroupsAdminPage() {
       <div className="mx-auto max-w-6xl">
         <AdminHeader />
         <section className="mx-auto max-w-4xl pb-20 pt-16">
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-red-600">Administration</p>
-          <h1 className="mt-4 text-4xl font-black tracking-tight text-slate-900">Groupes</h1>
+          <h1 className="text-center text-3xl font-black tracking-tight sm:text-4xl"><span className="text-red-600">ADMIN</span><span className="text-red-600"> - Groupes</span></h1>
           <p className="mt-5 max-w-2xl leading-7 text-slate-600">La gestion des groupes et de leurs créneaux sera disponible ici.</p>
           <Link href="/admin" className="mt-8 inline-flex font-semibold text-red-700 underline decoration-red-300 underline-offset-4">Retour aux sections</Link>
         </section>

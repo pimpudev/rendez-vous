@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import Link from "next/link";
 import { getSupabaseClient } from "../../lib/supabase";
 
 type CourseType = "individual" | "group" | "individual_group";
@@ -437,15 +438,14 @@ export default function AdminDashboard() {
 
   return (
     <section className="mx-auto mb-16 max-w-6xl">
-      <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">Administration</h1>
-          <p className="mt-2 text-sm text-slate-600">
-            {accessStatus === "demo" ? "Aperçu avec données fictives — les modifications ne sont pas enregistrées." : "Gestion des demandes de réservation."}
-          </p>
+      <div className="mb-8 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-4">
+        <div aria-hidden="true" />
+        <div className="text-center">
+          <h1 className="text-3xl font-black tracking-tight sm:text-4xl"><span className="text-red-600">ADMIN</span><span className="text-red-600"> - Étudiants</span></h1>
+          {accessStatus === "demo" && <p className="mt-2 text-sm text-slate-600">Aperçu avec données fictives — les modifications ne sont pas enregistrées.</p>}
         </div>
         {accessStatus === "ready" && (
-          <button type="button" onClick={handleLogout} className="text-sm font-semibold text-slate-700 underline decoration-slate-300 underline-offset-4 hover:text-red-600">
+          <button type="button" onClick={handleLogout} className="justify-self-end text-sm font-semibold text-slate-700 underline decoration-slate-300 underline-offset-4 hover:text-red-600">
             Se déconnecter
           </button>
         )}
@@ -630,6 +630,9 @@ export default function AdminDashboard() {
           </tbody>
         </table>
       </div>
+      <Link href="/admin" className="mt-8 inline-flex font-semibold text-red-700 underline decoration-red-300 underline-offset-4">
+        Retour aux sections
+      </Link>
     </section>
   );
 }

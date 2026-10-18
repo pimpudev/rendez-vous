@@ -38,24 +38,24 @@ const content = {
     methodOffer: "l’offre",
     methodOfferEnd: " qui vous correspond.",
     programsTitle: "OFFRES",
-    offerLinkLabel: "Voir l’offre",
+    offerLinkLabel: "Plus de détails",
     offerBlocks: [
       {
-        title: "INDIVIDUEL",
+        title: "INDIVIDUELLES",
         items: [
-          { slug: "individuel-professionnel", name: "Professionnel – 1 à 4 compétences", price: "3000 roupies = 30 euros / heure" },
-          { slug: "individuel-delf-dalf", name: "DELF DALF – 4 compétences", price: "2500 roupies = 25 euros / heure" },
-          { slug: "individuel-cours-libre", name: "Cours libre – 3 compétences", price: "2500 roupies = 25 euros / heure" },
-          { slug: "individuel-conversation", name: "Conversation – 2 compétences", price: "2000 roupies = 20 euros / heure" },
+          { slug: "individuel-professionnel", name: "Sur Mesure", price: "3000 roupies = 30 euros / heure" },
+          { slug: "individuel-delf-dalf", name: "Académique", price: "2500 roupies = 25 euros / heure" },
+          { slug: "individuel-cours-libre", name: "C’est la vie", price: "2500 roupies = 25 euros / heure" },
+          { slug: "individuel-conversation", name: "BlaBlaBla", price: "2000 roupies = 20 euros / heure" },
         ],
       },
       {
-        title: "GROUPE",
+        title: "GROUPES",
         items: [
-          { slug: "groupe-delf-a1-a2-b1", name: "DELF A1-A2-B1 – 4 compétences", price: "1000 roupies = 10 euros / heure / étudiant" },
-          { slug: "groupe-delf-b2-dalf-c1-c2", name: "DELF B2 - DALF C1-C2 – 4 compétences", price: "1500 roupies = 15 euros / heure / étudiant" },
-          { slug: "groupe-cours-libre", name: "Cours libre – 3 compétences", price: "1000 roupies = 10 euros / heure / étudiant" },
-          { slug: "groupe-conversation", name: "Conversation – 2 compétences", price: "800 roupies = 8 euros / heure / étudiant" },
+          { slug: "groupe-delf-a1-a2-b1", name: "Académique", price: "1000 roupies = 10 euros / heure" },
+          { slug: "groupe-delf-b2-dalf-c1-c2", name: "Académique Avancé", price: "1500 roupies = 15 euros / heure" },
+          { slug: "groupe-cours-libre", name: "C’est la vie", price: "1000 roupies = 10 euros / heure" },
+          { slug: "groupe-conversation", name: "BlaBlaBla", price: "500 roupies = 5 euros / heure" },
         ],
       },
     ],
@@ -110,24 +110,24 @@ const content = {
     methodOffer: "the offer",
     methodOfferEnd: " that suits you.",
     programsTitle: "OFFERS",
-    offerLinkLabel: "View course",
+    offerLinkLabel: "More details",
     offerBlocks: [
       {
         title: "INDIVIDUAL",
         items: [
-          { slug: "individuel-professionnel", name: "Professional – 1 to 4 skills", price: "3,000 rupees = 30 euros / hour" },
-          { slug: "individuel-delf-dalf", name: "DELF DALF – 4 skills", price: "2,500 rupees = 25 euros / hour" },
-          { slug: "individuel-cours-libre", name: "Open course – 3 skills", price: "2,500 rupees = 25 euros / hour" },
-          { slug: "individuel-conversation", name: "Conversation – 2 skills", price: "2,000 rupees = 20 euros / hour" },
+          { slug: "individuel-professionnel", name: "Tailor-made", price: "3,000 rupees = 30 euros / hour" },
+          { slug: "individuel-delf-dalf", name: "Academic", price: "2,500 rupees = 25 euros / hour" },
+          { slug: "individuel-cours-libre", name: "C’est la vie", price: "2,500 rupees = 25 euros / hour" },
+          { slug: "individuel-conversation", name: "BlaBlaBla", price: "2,000 rupees = 20 euros / hour" },
         ],
       },
       {
         title: "GROUP",
         items: [
-          { slug: "groupe-delf-a1-a2-b1", name: "DELF A1-A2-B1 – 4 skills", price: "1,000 rupees = 10 euros / hour / student" },
-          { slug: "groupe-delf-b2-dalf-c1-c2", name: "DELF B2 - DALF C1-C2 – 4 skills", price: "1,500 rupees = 15 euros / hour / student" },
-          { slug: "groupe-cours-libre", name: "Open course – 3 skills", price: "1,000 rupees = 10 euros / hour / student" },
-          { slug: "groupe-conversation", name: "Conversation – 2 skills", price: "800 rupees = 8 euros / hour / student" },
+          { slug: "groupe-delf-a1-a2-b1", name: "Academic", price: "1,000 rupees = 10 euros / hour" },
+          { slug: "groupe-delf-b2-dalf-c1-c2", name: "Advanced Academic", price: "1,500 rupees = 15 euros / hour" },
+          { slug: "groupe-cours-libre", name: "C’est la vie", price: "1,000 rupees = 10 euros / hour" },
+          { slug: "groupe-conversation", name: "BlaBlaBla", price: "500 rupees = 5 euros / hour" },
         ],
       },
     ],
@@ -182,24 +182,24 @@ const content = {
     methodOffer: "la oferta",
     methodOfferEnd: " que mejor se adapte a ti.",
     programsTitle: "OFERTAS",
-    offerLinkLabel: "Ver curso",
+    offerLinkLabel: "Más detalles",
     offerBlocks: [
       {
         title: "INDIVIDUAL",
         items: [
-          { slug: "individuel-professionnel", name: "Profesional – 1 a 4 competencias", price: "3000 rupias = 30 euros / hora" },
-          { slug: "individuel-delf-dalf", name: "DELF DALF – 4 competencias", price: "2500 rupias = 25 euros / hora" },
-          { slug: "individuel-cours-libre", name: "Curso libre – 3 competencias", price: "2500 rupias = 25 euros / hora" },
-          { slug: "individuel-conversation", name: "Conversación – 2 competencias", price: "2000 rupias = 20 euros / hora" },
+          { slug: "individuel-professionnel", name: "A medida", price: "3000 rupias = 30 euros / hora" },
+          { slug: "individuel-delf-dalf", name: "Académico", price: "2500 rupias = 25 euros / hora" },
+          { slug: "individuel-cours-libre", name: "C’est la vie", price: "2500 rupias = 25 euros / hora" },
+          { slug: "individuel-conversation", name: "BlaBlaBla", price: "2000 rupias = 20 euros / hora" },
         ],
       },
       {
         title: "GRUPO",
         items: [
-          { slug: "groupe-delf-a1-a2-b1", name: "DELF A1-A2-B1 – 4 competencias", price: "1000 rupias = 10 euros / hora / estudiante" },
-          { slug: "groupe-delf-b2-dalf-c1-c2", name: "DELF B2 - DALF C1-C2 – 4 competencias", price: "1500 rupias = 15 euros / hora / estudiante" },
-          { slug: "groupe-cours-libre", name: "Curso libre – 3 competencias", price: "1000 rupias = 10 euros / hora / estudiante" },
-          { slug: "groupe-conversation", name: "Conversación – 2 competencias", price: "800 rupias = 8 euros / hora / estudiante" },
+          { slug: "groupe-delf-a1-a2-b1", name: "Académico", price: "1000 rupias = 10 euros / hora" },
+          { slug: "groupe-delf-b2-dalf-c1-c2", name: "Académico avanzado", price: "1500 rupias = 15 euros / hora" },
+          { slug: "groupe-cours-libre", name: "C’est la vie", price: "1000 rupias = 10 euros / hora" },
+          { slug: "groupe-conversation", name: "BlaBlaBla", price: "500 rupias = 5 euros / hora" },
         ],
       },
     ],
@@ -225,14 +225,57 @@ const content = {
 } as const;
 
 const offerPrices = {
-  "groupe-conversation": { inr: 800, eur: 8, perStudent: true },
-  "groupe-delf-a1-a2-b1": { inr: 1000, eur: 10, perStudent: true },
-  "groupe-cours-libre": { inr: 1000, eur: 10, perStudent: true },
-  "groupe-delf-b2-dalf-c1-c2": { inr: 1500, eur: 15, perStudent: true },
-  "individuel-conversation": { inr: 2000, eur: 20, perStudent: false },
-  "individuel-delf-dalf": { inr: 2500, eur: 25, perStudent: false },
-  "individuel-cours-libre": { inr: 2500, eur: 25, perStudent: false },
-  "individuel-professionnel": { inr: 3000, eur: 30, perStudent: false },
+  "groupe-conversation": { inr: 500, eur: 5 },
+  "groupe-delf-a1-a2-b1": { inr: 1000, eur: 10 },
+  "groupe-cours-libre": { inr: 1000, eur: 10 },
+  "groupe-delf-b2-dalf-c1-c2": { inr: 1500, eur: 15 },
+  "individuel-conversation": { inr: 2000, eur: 20 },
+  "individuel-delf-dalf": { inr: 2500, eur: 25 },
+  "individuel-cours-libre": { inr: 2500, eur: 25 },
+  "individuel-professionnel": { inr: 3000, eur: 30 },
+} as const;
+
+const offerCopy = {
+  "individuel-conversation": {
+    fr: { highlights: ["Conversation détendue", "Focus sur la prononciation et l’aisance orale"] },
+    en: { highlights: ["Relaxed conversation", "Focus on pronunciation and speaking confidence"] },
+    es: { highlights: ["Conversación relajada", "Enfoque en la pronunciación y la soltura oral"] },
+  },
+  "individuel-cours-libre": {
+    fr: { highlights: ["Documents authentiques", "Grammaire", "Sujets d’actualité", "Débat"] },
+    en: { highlights: ["Authentic materials", "Grammar", "Current affairs", "Debate"] },
+    es: { highlights: ["Documentos auténticos", "Gramática", "Temas de actualidad", "Debate"] },
+  },
+  "individuel-delf-dalf": {
+    fr: { highlights: ["Préparation aux examens", "DELF DALF", "TCF", "TEF"] },
+    en: { highlights: ["Exam preparation", "DELF DALF", "TCF", "TEF"] },
+    es: { highlights: ["Preparación para los exámenes", "DELF DALF", "TCF", "TEF"] },
+  },
+  "individuel-professionnel": {
+    fr: { highlights: ["Documents techniques / spécialisés", "Parcours unique créé pour l’étudiant", "Accompagnement vers un objectif personnel ou professionnel personnalisé"] },
+    en: { highlights: ["Technical / specialised materials", "A unique course created for the student", "Personalised support towards a personal or professional goal"] },
+    es: { highlights: ["Documentos técnicos / especializados", "Itinerario único creado para el estudiante", "Acompañamiento personalizado hacia un objetivo personal o profesional"] },
+  },
+  "groupe-conversation": {
+    fr: { highlights: ["Conversation détendue", "Focus sur la prononciation et l’aisance orale"] },
+    en: { highlights: ["Relaxed conversation", "Focus on pronunciation and speaking confidence"] },
+    es: { highlights: ["Conversación relajada", "Enfoque en la pronunciación y la soltura oral"] },
+  },
+  "groupe-cours-libre": {
+    fr: { highlights: ["Documents authentiques", "Grammaire", "Sujets d’actualité", "Débat"] },
+    en: { highlights: ["Authentic materials", "Grammar", "Current affairs", "Debate"] },
+    es: { highlights: ["Documentos auténticos", "Gramática", "Temas de actualidad", "Debate"] },
+  },
+  "groupe-delf-a1-a2-b1": {
+    fr: { highlights: ["Préparation aux examens", "DELF A1 – A2 - B1"] },
+    en: { highlights: ["Exam preparation", "DELF A1 – A2 - B1"] },
+    es: { highlights: ["Preparación para los exámenes", "DELF A1 – A2 - B1"] },
+  },
+  "groupe-delf-b2-dalf-c1-c2": {
+    fr: { highlights: ["Préparation aux examens", "DELF B2", "DALF C1 – C2", "TCF", "TEF"] },
+    en: { highlights: ["Exam preparation", "DELF B2", "DALF C1 – C2", "TCF", "TEF"] },
+    es: { highlights: ["Preparación para los exámenes", "DELF B2", "DALF C1 – C2", "TCF", "TEF"] },
+  },
 } as const;
 
 type Currency = "INR" | "EUR";
@@ -240,6 +283,7 @@ type HomeOffer = {
   slug: string;
   category: "individual" | "group";
   name: string;
+  highlights: string[];
   price_inr: number;
   price_eur: number;
 };
@@ -279,18 +323,13 @@ function rememberIntroSeen() {
 
 function formatOfferPrice(offer: HomeOffer, currency: Currency, language: SiteLanguage) {
   const amount = currency === "INR" ? offer.price_inr : offer.price_eur;
-  const perStudent = offer.category === "group";
   const locale = language === "fr" ? "fr-FR" : language === "en" ? "en-IN" : "es-ES";
   const formattedAmount = new Intl.NumberFormat(locale, {
     style: "currency",
     currency,
     maximumFractionDigits: 2,
   }).format(amount);
-  const unit = language === "fr"
-    ? perStudent ? " / heure / étudiant" : " / heure"
-    : language === "en"
-      ? perStudent ? " / hour / student" : " / hour"
-      : perStudent ? " / hora / estudiante" : " / hora";
+  const unit = language === "fr" ? " / heure" : language === "en" ? " / hour" : " / hora";
 
   return `${formattedAmount}${unit}`;
 }
@@ -335,10 +374,12 @@ export default function Home() {
   const homeOffers: HomeOffer[] = publishedOffers === null
     ? t.offerBlocks.flatMap((block) => block.items.map((offer) => {
       const price = offerPrices[offer.slug as keyof typeof offerPrices];
+      const copy = offerCopy[offer.slug as keyof typeof offerCopy][lang];
       return {
         slug: offer.slug,
         category: offer.slug.startsWith("groupe-") ? "group" : "individual",
         name: offer.name,
+        highlights: [...copy.highlights],
         price_inr: price.inr,
         price_eur: price.eur,
       };
@@ -347,6 +388,11 @@ export default function Home() {
       slug: offer.slug,
       category: offer.category,
       name: lang === "fr" ? offer.name_fr : lang === "en" ? offer.name_en || offer.name_fr : offer.name_es || offer.name_fr,
+      highlights: lang === "fr"
+        ? offer.requirements_fr
+        : lang === "en"
+          ? offer.requirements_en.length > 0 ? offer.requirements_en : offer.requirements_fr
+          : offer.requirements_es.length > 0 ? offer.requirements_es : offer.requirements_fr,
       price_inr: offer.price_inr,
       price_eur: offer.price_eur,
     }));
@@ -498,16 +544,16 @@ export default function Home() {
         </section>
 
         <section id="programs" className="mx-auto max-w-6xl px-6 py-20 lg:px-8">
-          <div className="flex flex-wrap items-center justify-between gap-5">
-            <h2 className="text-3xl font-black tracking-tight text-slate-900 sm:text-5xl">{t.programsTitle}</h2>
-            <div className="flex flex-wrap items-center gap-3" role="group" aria-label={lang === "fr" ? "Choisir la devise" : lang === "en" ? "Choose currency" : "Elegir moneda"}>
+          <div className="flex flex-col items-center gap-8">
+            <h2 className="text-center text-3xl font-black tracking-tight text-slate-900 sm:text-5xl">{t.programsTitle}</h2>
+            <div className="flex flex-wrap items-center justify-center gap-3" role="group" aria-label={lang === "fr" ? "Choisir la devise" : lang === "en" ? "Choose currency" : "Elegir moneda"}>
               <div className="inline-flex rounded-full border border-slate-200 bg-slate-100 p-1">
                 <button
                   type="button"
                   aria-pressed={currency === "INR"}
                   aria-label={lang === "fr" ? "Afficher les prix en roupies indiennes" : lang === "en" ? "Show prices in Indian rupees" : "Mostrar precios en rupias indias"}
                   onClick={() => setCurrency("INR")}
-                  className={`min-h-9 rounded-full px-3 text-sm font-semibold transition ${currency === "INR" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-900"}`}
+                  className={`min-h-8 rounded-full px-2.5 text-xs font-semibold transition ${currency === "INR" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-900"}`}
                 >
                   ₹ INR
                 </button>
@@ -516,7 +562,7 @@ export default function Home() {
                   aria-pressed={currency === "EUR"}
                   aria-label={lang === "fr" ? "Afficher les prix en euros" : lang === "en" ? "Show prices in euros" : "Mostrar precios en euros"}
                   onClick={() => setCurrency("EUR")}
-                  className={`min-h-9 rounded-full px-3 text-sm font-semibold transition ${currency === "EUR" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-900"}`}
+                  className={`min-h-8 rounded-full px-2.5 text-xs font-semibold transition ${currency === "EUR" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-900"}`}
                 >
                   € EUR
                 </button>
@@ -533,9 +579,12 @@ export default function Home() {
                 <div className="mt-5">
                   <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
                   {block.items.map((offer) => (
-                    <Link key={offer.slug} href={`/offres/${offer.slug}`} className="group flex min-h-[300px] flex-col rounded-lg border border-slate-200 bg-white px-6 py-7 transition-colors hover:border-slate-300 hover:bg-slate-50 focus-visible:relative focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-red-600">
-                        <h4 className="min-h-[4.5rem] text-lg font-bold leading-6 text-slate-900">{offer.name}</h4>
-                        <p className="mt-5 text-sm font-normal leading-6 text-slate-600">{formatOfferPrice(offer, currency, lang)}</p>
+                    <Link key={offer.slug} href={`/offres/${offer.slug}`} className="group flex min-h-[420px] flex-col rounded-lg border border-slate-200 bg-white px-6 py-7 transition-colors hover:border-slate-300 hover:bg-slate-50 focus-visible:relative focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-red-600">
+                        <h4 className="min-h-[4.5rem] text-center text-lg font-bold leading-6 text-slate-900">{offer.name}</h4>
+                        <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-slate-600 marker:text-slate-500">
+                          {offer.highlights.map((highlight) => <li key={highlight}>{highlight}</li>)}
+                          <li className="pt-3 font-normal">{formatOfferPrice(offer, currency, lang)}</li>
+                        </ul>
                         <span className="mt-auto inline-flex min-h-10 items-center justify-center rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition-colors group-hover:bg-red-600">
                           {t.offerLinkLabel}
                         </span>
@@ -545,6 +594,22 @@ export default function Home() {
                 </div>
               </section>
             ))}
+          </div>
+
+          <div className="mt-10 space-y-3 border-t border-slate-200 pt-6 text-center text-base leading-7 text-slate-700">
+            <p>
+              Vous n’êtes pas sûr de votre niveau (A1…B2 ?) ou vous hésitez entre plusieurs offres ?{" "}
+              <Link href="/#faq-niveau-francais" className="font-bold text-red-600 underline decoration-red-300 underline-offset-4 hover:text-red-700">
+                Cliquez ici
+              </Link>
+            </p>
+            <p>
+              Si vous avez une requête spéciale,{" "}
+              <Link href="#contact" className="font-bold text-red-600 underline decoration-red-300 underline-offset-4 hover:text-red-700">
+                contactez-nous
+              </Link>
+              !
+            </p>
           </div>
         </section>
 
@@ -581,7 +646,8 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-5xl px-6 py-20 text-center lg:px-8">
+        <section id="contact" className="mx-auto max-w-5xl px-6 py-20 text-center lg:px-8">
+          <h2 className="mb-8 text-3xl font-black tracking-tight text-slate-900 sm:text-5xl">Contact</h2>
           <div className="rounded-[2rem] bg-gradient-to-r from-red-500 to-rose-600 p-[1px] shadow-[0_20px_60px_rgba(239,68,68,0.25)]">
             <div className="rounded-[calc(2rem-1px)] bg-white px-8 py-12">
               <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">{t.ctaTitle}</h2>
@@ -594,7 +660,7 @@ export default function Home() {
         </section>
       </main>
 
-      <footer id="contact" inert={introVisible} aria-hidden={introVisible} className="border-t border-slate-200 bg-white">
+      <footer inert={introVisible} aria-hidden={introVisible} className="border-t border-slate-200 bg-white">
         <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-3 px-6 py-8 text-sm text-slate-500 sm:grid-cols-3 lg:px-8">
           <Link href="/admin" className="justify-self-start font-semibold transition hover:text-red-600">
             Admin

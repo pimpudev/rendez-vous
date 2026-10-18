@@ -8,9 +8,7 @@ export default function PlanningAdminPage() {
       <div className="mx-auto max-w-6xl">
         <AdminHeader />
         <section className="mx-auto max-w-4xl pb-20 pt-16">
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-red-600">Administration</p>
-          <h1 className="mt-4 text-4xl font-black tracking-tight text-slate-900">Planning</h1>
-          <p className="mt-4 max-w-2xl leading-7 text-slate-600">Les créneaux ouverts ici apparaissent en temps réel dans les formulaires de réservation.</p>
+          <h1 className="text-center text-3xl font-black tracking-tight sm:text-4xl"><span className="text-red-600">ADMIN</span><span className="text-red-600"> - Planning</span></h1>
           <div className="mt-8">
             <PlanningDashboard />
           </div>
