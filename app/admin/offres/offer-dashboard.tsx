@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { Pencil, Plus, RotateCcw, Trash2, X } from "lucide-react";
+import Link from "next/link";
 import { getSupabaseClient } from "../../../lib/supabase";
 import type { CourseOffer } from "../../../lib/course-offers";
 import MarkdownContent from "../../markdown-content";
@@ -99,8 +100,6 @@ export default function OfferDashboard() {
     getSupabaseClient() ? "checking" : "unconfigured",
   );
   const [offers, setOffers] = useState<CourseOffer[]>([]);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [form, setForm] = useState<OfferForm>(emptyForm);
   const [editingOffer, setEditingOffer] = useState<CourseOffer | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
@@ -171,21 +170,6 @@ export default function OfferDashboard() {
       isActive = false;
     };
   }, []);
-
-  async function handleLogin(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const supabase = getSupabaseClient();
-    if (!supabase) return;
-
-    setErrorMessage("");
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      setErrorMessage("Connexion impossible. Vérifiez votre e-mail et votre mot de passe.");
-      return;
-    }
-
-    await verifyAdmin(data.user.id);
-  }
 
   function startEditing(offer: CourseOffer) {
     setEditingOffer(offer);
@@ -283,21 +267,7 @@ export default function OfferDashboard() {
     return (
       <section className="mx-auto max-w-xl rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
         {accessStatus === "checking" && <p role="status" className="text-sm text-slate-600">Vérification de l’accès administrateur…</p>}
-        {accessStatus === "signed-out" && (
-          <form onSubmit={handleLogin} className="space-y-5">
-            <h2 className="text-xl font-bold text-slate-900">Connexion administrateur</h2>
-            <label className="block text-sm font-semibold text-slate-800">
-              E-mail
-              <input required type="email" autoComplete="username" value={email} onChange={(event) => setEmail(event.target.value)} className={fieldClassName} />
-            </label>
-            <label className="block text-sm font-semibold text-slate-800">
-              Mot de passe
-              <input required type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} className={fieldClassName} />
-            </label>
-            {errorMessage && <p role="alert" className="text-sm text-red-700">{errorMessage}</p>}
-            <button type="submit" className="min-h-11 rounded-lg bg-slate-900 px-5 py-2 text-sm font-semibold text-white hover:bg-red-600">Se connecter</button>
-          </form>
-        )}
+        {accessStatus === "signed-out" && <Link href="/admin/login" className="font-semibold text-red-700 underline decoration-red-300 underline-offset-4">Se connecter</Link>}
         {accessStatus === "unconfigured" && <p role="alert" className="text-sm text-red-700">Supabase n’est pas configuré pour gérer les offres.</p>}
         {accessStatus === "denied" && <p role="alert" className="text-sm text-red-700">Ce compte ne dispose pas des droits administrateur.</p>}
         {accessStatus === "error" && <p role="alert" className="text-sm text-red-700">{errorMessage}</p>}

@@ -163,12 +163,12 @@ function getRequestStatusOptions(registration: Reservation) {
   ];
 
   if (registration.registration_type === 3) {
-    options.unshift({ value: "waitlist", label: "En attente de création" });
+    options.splice(1, 0, { value: "waitlist", label: "En attente de création de groupe" });
   }
 
   if (!options.some((option) => option.value === registration.student_status)) {
     const legacyStatusLabels: Record<StudentStatus, string> = {
-      waitlist: "En attente de création (ancien statut)",
+      waitlist: "En attente de création de groupe (ancien statut)",
       to_validate: "En attente de validation",
       payment_pending: "En attente de règlement",
       enrolled: "Inscrit (ancien statut)",
@@ -224,8 +224,6 @@ export default function AdminDashboard() {
   const [followedCourses, setFollowedCourses] = useState<FollowedCourse[]>([]);
   const [studentNotes, setStudentNotes] = useState<Record<string, string>>({});
   const [savedStudentNotes, setSavedStudentNotes] = useState<Record<string, string>>({});
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState("");
   const [saveError, setSaveError] = useState("");
   const [savingId, setSavingId] = useState<string | null>(null);
@@ -293,26 +291,6 @@ export default function AdminDashboard() {
     }
 
     setAccessStatus("ready");
-  }
-
-  async function handleLogin(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const supabase = getSupabaseClient();
-
-    if (!supabase) {
-      setLoginError("Supabase n’est pas configuré. Utilisez la démo ou configurez les variables d’environnement.");
-      return;
-    }
-
-    setLoginError("");
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-
-    if (error) {
-      setLoginError("Connexion impossible. Vérifiez votre e-mail et votre mot de passe.");
-      return;
-    }
-
-    await refreshAdminData(supabase, data.user.id);
   }
 
   async function updateReservation(
@@ -504,6 +482,7 @@ export default function AdminDashboard() {
     await getSupabaseClient()?.auth.signOut();
     setReservations([]);
     setAccessStatus("signed-out");
+    window.location.assign("/admin/login");
   }
 
   if (accessStatus === "checking") {
@@ -513,41 +492,12 @@ export default function AdminDashboard() {
   if (accessStatus === "signed-out" || accessStatus === "denied" || accessStatus === "error") {
     return (
       <section className="mx-auto mb-16 max-w-md rounded-2xl border border-slate-200 bg-white p-7 shadow-sm sm:p-9">
-        <h1 className="text-2xl font-bold text-slate-900">Connexion administrateur</h1>
-        <p className="mt-2 text-sm leading-6 text-slate-600">
-          Connectez-vous avec un compte inscrit dans la liste des administrateurs.
-        </p>
+        <h1 className="text-2xl font-bold text-slate-900">Session administrateur</h1>
         {accessStatus === "denied" && (
           <p role="alert" className="mt-4 text-sm font-semibold text-red-700">Ce compte n’a pas les droits administrateur.</p>
         )}
         {loginError && <p role="alert" className="mt-4 text-sm font-semibold text-red-700">{loginError}</p>}
-        <form onSubmit={handleLogin} className="mt-6 space-y-4">
-          <label className="block text-sm font-semibold text-slate-800">
-            E-mail
-            <input
-              type="email"
-              autoComplete="username"
-              required
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              className={selectClassName}
-            />
-          </label>
-          <label className="block text-sm font-semibold text-slate-800">
-            Mot de passe
-            <input
-              type="password"
-              autoComplete="current-password"
-              required
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              className={selectClassName}
-            />
-          </label>
-          <button type="submit" className="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-red-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-red-500">
-            Se connecter
-          </button>
-        </form>
+        <Link href="/admin/login" className="mt-6 inline-flex font-semibold text-red-700 underline decoration-red-300 underline-offset-4">Se connecter</Link>
       </section>
     );
   }
