@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import ThemeToggle from "./theme-toggle";
 import { LanguageSelector, useSiteLanguage, type SiteLanguage } from "./site-language";
@@ -36,7 +36,7 @@ const content = {
     methodOfferStart: "Selon votre objectif, votre disponibilité et votre budget, choisissez ",
     methodOffer: "l’offre",
     methodOfferEnd: " qui vous correspond.",
-    programsTitle: "Cours",
+    programsTitle: "OFFRES",
     offerLinkLabel: "Voir l’offre",
     offerBlocks: [
       {
@@ -108,7 +108,7 @@ const content = {
     methodOfferStart: "Depending on your goals, availability, and budget, choose ",
     methodOffer: "the offer",
     methodOfferEnd: " that suits you.",
-    programsTitle: "Courses",
+    programsTitle: "OFFERS",
     offerLinkLabel: "View course",
     offerBlocks: [
       {
@@ -180,7 +180,7 @@ const content = {
     methodOfferStart: "Según tus objetivos, disponibilidad y presupuesto, elige ",
     methodOffer: "la oferta",
     methodOfferEnd: " que mejor se adapte a ti.",
-    programsTitle: "Cursos",
+    programsTitle: "OFERTAS",
     offerLinkLabel: "Ver curso",
     offerBlocks: [
       {
@@ -223,6 +223,69 @@ const content = {
   },
 } as const;
 
+const offerPrices = {
+  "groupe-conversation": { inr: 800, eur: 8, perStudent: true },
+  "groupe-delf-a1-a2-b1": { inr: 1000, eur: 10, perStudent: true },
+  "groupe-cours-libre": { inr: 1000, eur: 10, perStudent: true },
+  "groupe-delf-b2-dalf-c1-c2": { inr: 1500, eur: 15, perStudent: true },
+  "individuel-conversation": { inr: 2000, eur: 20, perStudent: false },
+  "individuel-delf-dalf": { inr: 2500, eur: 25, perStudent: false },
+  "individuel-cours-libre": { inr: 2500, eur: 25, perStudent: false },
+  "individuel-professionnel": { inr: 3000, eur: 30, perStudent: false },
+} as const;
+
+type Currency = "INR" | "EUR";
+const introStorageKey = "rendez-vous-intro-seen";
+const introListeners = new Set<() => void>();
+
+function subscribeToIntro(listener: () => void) {
+  introListeners.add(listener);
+  window.addEventListener("storage", listener);
+
+  return () => {
+    introListeners.delete(listener);
+    window.removeEventListener("storage", listener);
+  };
+}
+
+function hasSeenIntro() {
+  try {
+    return localStorage.getItem(introStorageKey) === "true";
+  } catch {
+    return false;
+  }
+}
+
+function hasSeenIntroOnServer() {
+  return false;
+}
+
+function rememberIntroSeen() {
+  try {
+    localStorage.setItem(introStorageKey, "true");
+  } catch {}
+
+  introListeners.forEach((listener) => listener());
+}
+
+function formatOfferPrice(slug: string, currency: Currency, language: SiteLanguage) {
+  const price = offerPrices[slug as keyof typeof offerPrices];
+  const amount = currency === "INR" ? price.inr : price.eur;
+  const locale = language === "fr" ? "fr-FR" : language === "en" ? "en-IN" : "es-ES";
+  const formattedAmount = new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency,
+    maximumFractionDigits: 0,
+  }).format(amount);
+  const unit = language === "fr"
+    ? price.perStudent ? " / heure / étudiant" : " / heure"
+    : language === "en"
+      ? price.perStudent ? " / hour / student" : " / hour"
+      : price.perStudent ? " / hora / estudiante" : " / hora";
+
+  return `${formattedAmount}${unit}`;
+}
+
 function emphasizeProjectName(text: string) {
   return text.split(/(rendez-vous)/gi).map((part, index) =>
     /^rendez-vous$/i.test(part) ? <strong key={index}>{part}</strong> : part,
@@ -254,9 +317,22 @@ function renderTeacherBio(text: string, teacherName: string) {
 
 export default function Home() {
   const lang: SiteLanguage = useSiteLanguage();
-  const [introVisible, setIntroVisible] = useState(true);
+  const introSeen = useSyncExternalStore(subscribeToIntro, hasSeenIntro, hasSeenIntroOnServer);
+  const introVisible = !introSeen;
   const [introLeaving, setIntroLeaving] = useState(false);
+  const [currency, setCurrency] = useState<Currency>("INR");
   const t = content[lang];
+  const orderedOfferBlocks = [...t.offerBlocks]
+    .map((block) => ({
+      ...block,
+      items: [...block.items].sort((first, second) =>
+        offerPrices[first.slug as keyof typeof offerPrices].inr - offerPrices[second.slug as keyof typeof offerPrices].inr,
+      ),
+    }))
+    .sort((first, second) =>
+      Math.min(...first.items.map((offer) => offerPrices[offer.slug as keyof typeof offerPrices].inr))
+      - Math.min(...second.items.map((offer) => offerPrices[offer.slug as keyof typeof offerPrices].inr)),
+    );
 
   useEffect(() => {
     if (!introVisible) return;
@@ -264,7 +340,7 @@ export default function Home() {
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const leaveTimer = window.setTimeout(() => setIntroLeaving(true), 2600);
-    const hideTimer = window.setTimeout(() => setIntroVisible(false), 3600);
+    const hideTimer = window.setTimeout(rememberIntroSeen, 3600);
 
     return () => {
       window.clearTimeout(leaveTimer);
@@ -392,22 +468,44 @@ export default function Home() {
         </section>
 
         <section id="programs" className="mx-auto max-w-6xl px-6 py-20 lg:px-8">
-          <div className="mx-auto max-w-2xl text-center">
+          <div className="flex flex-wrap items-center justify-between gap-5">
             <h2 className="text-3xl font-black tracking-tight text-slate-900 sm:text-5xl">{t.programsTitle}</h2>
+            <div className="flex flex-wrap items-center gap-3" role="group" aria-label={lang === "fr" ? "Choisir la devise" : lang === "en" ? "Choose currency" : "Elegir moneda"}>
+              <div className="inline-flex rounded-full border border-slate-200 bg-slate-100 p-1">
+                <button
+                  type="button"
+                  aria-pressed={currency === "INR"}
+                  aria-label={lang === "fr" ? "Afficher les prix en roupies indiennes" : lang === "en" ? "Show prices in Indian rupees" : "Mostrar precios en rupias indias"}
+                  onClick={() => setCurrency("INR")}
+                  className={`min-h-9 rounded-full px-3 text-sm font-semibold transition ${currency === "INR" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-900"}`}
+                >
+                  ₹ INR
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={currency === "EUR"}
+                  aria-label={lang === "fr" ? "Afficher les prix en euros" : lang === "en" ? "Show prices in euros" : "Mostrar precios en euros"}
+                  onClick={() => setCurrency("EUR")}
+                  className={`min-h-9 rounded-full px-3 text-sm font-semibold transition ${currency === "EUR" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-900"}`}
+                >
+                  € EUR
+                </button>
+              </div>
+            </div>
           </div>
 
           <div className="mt-10 space-y-14">
-            {t.offerBlocks.map((block) => (
+            {orderedOfferBlocks.map((block) => (
               <section key={block.title} aria-label={block.title}>
                 <div className="border-b border-slate-200 pb-4">
                   <h3 className="text-2xl font-black tracking-tight text-slate-900">{block.title}</h3>
                 </div>
-                <div className="mt-5 overflow-x-auto border-y border-slate-200">
-                  <div className="grid min-w-[1120px] grid-cols-4 divide-x divide-slate-200">
+                <div className="mt-5">
+                  <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
                   {block.items.map((offer) => (
-                    <Link key={offer.slug} href={`/offres/${offer.slug}`} className="group flex min-h-[300px] flex-col bg-white px-6 py-7 transition-colors hover:bg-slate-50 focus-visible:relative focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-red-600">
+                    <Link key={offer.slug} href={`/offres/${offer.slug}`} className="group flex min-h-[300px] flex-col rounded-lg border border-slate-200 bg-white px-6 py-7 transition-colors hover:border-slate-300 hover:bg-slate-50 focus-visible:relative focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-red-600">
                         <h4 className="min-h-[4.5rem] text-lg font-bold leading-6 text-slate-900">{offer.name}</h4>
-                        <p className="mt-5 text-sm font-normal leading-6 text-slate-600">{offer.price}</p>
+                        <p className="mt-5 text-sm font-normal leading-6 text-slate-600">{formatOfferPrice(offer.slug, currency, lang)}</p>
                         <span className="mt-auto inline-flex min-h-10 items-center justify-center rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition-colors group-hover:bg-red-600">
                           {t.offerLinkLabel}
                         </span>

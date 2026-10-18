@@ -104,7 +104,15 @@ async function loadAdminReservations(
 
 const selectClassName =
   "min-h-10 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-200";
-const frenchLevels = ["COMPLETE BEGINNER", "A1", "A2", "B1", "B2", "C1", "C2"];
+const frenchLevels = [
+  { value: "COMPLETE BEGINNER", label: "Débutant complet" },
+  { value: "A1", label: "A1" },
+  { value: "A2", label: "A2" },
+  { value: "B1", label: "B1" },
+  { value: "B2", label: "B2" },
+  { value: "C1", label: "C1" },
+  { value: "C2", label: "C2" },
+];
 
 function groupStudentReservations(reservations: Reservation[]): StudentRow[] {
   const grouped = new Map<string, Reservation[]>();
@@ -516,7 +524,7 @@ export default function AdminDashboard() {
                     >
                       <option value="">À préciser</option>
                       {frenchLevel === "multiple" && <option value="multiple" disabled>Plusieurs niveaux</option>}
-                      {frenchLevels.map((level) => <option key={level} value={level}>{level}</option>)}
+                      {frenchLevels.map((level) => <option key={level.value} value={level.value}>{level.label}</option>)}
                     </select>
                   </td>
                   <td className="px-4 py-4">

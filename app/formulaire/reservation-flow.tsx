@@ -15,40 +15,71 @@ type OpenGroup = {
 
 type GroupLoadStatus = "loading" | "ready" | "error";
 
-const levels = ["COMPLETE BEGINNER", "A1", "A2", "B1", "B2", "C1", "C2"];
-const weekdays = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
+const levels = [
+  { value: "COMPLETE BEGINNER", label: "Débutant complet" },
+  { value: "A1", label: "A1" },
+  { value: "A2", label: "A2" },
+  { value: "B1", label: "B1" },
+  { value: "B2", label: "B2" },
+  { value: "C1", label: "C1" },
+  { value: "C2", label: "C2" },
+];
+const weekdays = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"];
 const hourlySlots = Array.from({ length: 10 }, (_, index) => {
   const start = index + 10;
   const end = start + 1;
-  return `${String(start).padStart(2, "0")}:00–${String(end).padStart(2, "0")}:00`;
+  return { start, value: `${String(start).padStart(2, "0")}:00–${String(end).padStart(2, "0")}:00` };
 });
 
 const inputClassName =
   "mt-2 min-h-12 w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-200";
 
-function AvailabilityPicker() {
+function AvailabilityPicker({ availableSlots, selectedSlots, onToggle }: { availableSlots: string[]; selectedSlots: string[]; onToggle: (slot: string) => void }) {
   return (
     <fieldset className="border-t border-slate-200 py-6">
       <legend className="text-lg font-bold text-slate-900">Je suis disponible :</legend>
-      <p className="mt-1 text-sm text-slate-600">Cochez un ou plusieurs créneaux d’une heure, du lundi au samedi entre 10 h et 20 h.</p>
-      <div className="mt-5 grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-3">
-        {weekdays.map((day) => (
-          <fieldset key={day} className="border-t border-slate-200 pt-3">
-            <legend className="font-semibold text-slate-800">{day}</legend>
-            <div className="mt-2 space-y-2">
-              {hourlySlots.map((slot) => {
-                const value = `${day} ${slot}`;
-                return (
-                  <label key={value} className="flex min-h-7 items-center gap-2 text-sm text-slate-700">
-                    <input type="checkbox" name="availability_slots[]" value={value} className="h-4 w-4 accent-red-600" />
-                    <span>{slot}</span>
-                  </label>
-                );
-              })}
-            </div>
-          </fieldset>
-        ))}
+      <div className="mt-4 overflow-x-auto pb-2">
+        <table className="w-full min-w-[620px] border-separate border-spacing-1 text-center text-xs">
+          <thead>
+            <tr>
+              <th scope="col" className="w-16 px-2 py-2 text-left font-semibold text-slate-600">Heure</th>
+              {weekdays.map((day) => <th key={day} scope="col" className="px-2 py-2 font-semibold text-slate-800">{day}</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {hourlySlots.map(({ start, value }) => (
+              <tr key={value}>
+                <th scope="row" className="whitespace-nowrap px-2 py-1 text-left font-medium text-slate-600">{start} h</th>
+                {weekdays.map((day) => {
+                  const slot = `${day} ${value}`;
+                  const available = availableSlots.includes(slot);
+                  const selected = selectedSlots.includes(slot);
+                  return (
+                    <td key={slot} className="p-0">
+                      {available ? (
+                        <button
+                          type="button"
+                          aria-label={`${selected ? "Retirer" : "Choisir"} ${day}, ${value}`}
+                          aria-pressed={selected}
+                          title={`${day} ${value}`}
+                          onClick={() => onToggle(slot)}
+                          className={`h-10 w-full rounded-md border text-sm font-semibold transition-colors ${selected ? "border-emerald-700 bg-emerald-600 text-white" : "border-slate-200 bg-slate-50 text-slate-700 hover:border-emerald-400 hover:bg-emerald-50"}`}
+                        >
+                          {selected ? "✓" : "Disponible"}
+                        </button>
+                      ) : (
+                        <span aria-label={`${day}, ${value} : indisponible`} className="block h-10 rounded-md bg-slate-100" />
+                      )}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
+      <p className="mt-2 text-sm text-slate-600">Vous pouvez sélectionner autant de jours / heures que vous souhaitez.</p>
+      {selectedSlots.map((slot) => <input key={slot} type="hidden" name="availability_slots[]" value={slot} />)}
     </fieldset>
   );
 }
@@ -69,6 +100,11 @@ export default function ReservationFlow({
   const [groupRetry, setGroupRetry] = useState(0);
   const [selectedGroupId, setSelectedGroupId] = useState("");
   const [declinedGroupIds, setDeclinedGroupIds] = useState<string[]>([]);
+  const [selectedAvailabilitySlots, setSelectedAvailabilitySlots] = useState<string[]>([]);
+  const [availableSlots, setAvailableSlots] = useState<string[]>([]);
+  const [availabilityStatus, setAvailabilityStatus] = useState<"loading" | "ready" | "error">(() =>
+    getSupabaseClient() ? "loading" : "error",
+  );
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -101,6 +137,39 @@ export default function ReservationFlow({
     };
   }, [offerType, selectedOffer, groupRetry]);
 
+  useEffect(() => {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+
+    let isActive = true;
+    const loadAvailability = async () => {
+      const { data, error } = await supabase.from("teacher_availability_slots").select("slot");
+      if (!isActive) return;
+      if (error) {
+        setAvailabilityStatus("error");
+        return;
+      }
+
+      const slots = (data ?? []).map((row) => row.slot as string);
+      setAvailableSlots(slots);
+      setSelectedAvailabilitySlots((current) => current.filter((slot) => slots.includes(slot)));
+      setAvailabilityStatus("ready");
+    };
+
+    void loadAvailability();
+    const channel = supabase
+      .channel("public-teacher-availability")
+      .on("postgres_changes", { event: "*", schema: "public", table: "teacher_availability_slots" }, () => {
+        void loadAvailability();
+      })
+      .subscribe();
+
+    return () => {
+      isActive = false;
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
@@ -122,7 +191,7 @@ export default function ReservationFlow({
 
     const formData = new FormData(form);
     const text = (name: string) => String(formData.get(name) ?? "").trim();
-    const availabilitySlots = formData.getAll("availability_slots[]").map(String);
+    const availabilitySlots = selectedAvailabilitySlots;
     const registrationType = offerType === "individual" ? 1 : selectedGroup ? 2 : 3;
 
     if (registrationType !== 2 && availabilitySlots.length === 0) {
@@ -191,14 +260,6 @@ export default function ReservationFlow({
 
   return (
     <form onSubmit={handleSubmit} className="mx-auto mb-16 max-w-4xl rounded-2xl border border-slate-200 bg-white px-6 py-2 shadow-sm sm:px-10">
-      <div className="border-b border-slate-200 py-5">
-        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-500">
-          {offerType === "individual" ? "Formulaire individuel" : "Formulaire groupe"}
-        </p>
-        <p className="mt-3 text-base leading-7 text-slate-600">Merci pour votre intérêt.</p>
-        <p className="text-base leading-7 text-slate-600">Vous êtes à quelques clics de prendre Rendez-Vous.</p>
-      </div>
-
       <div className="grid gap-5 border-t border-slate-200 py-6 sm:grid-cols-2">
         <label className="block text-sm font-semibold text-slate-800">
           Prénom
@@ -215,12 +276,12 @@ export default function ReservationFlow({
       </div>
 
       <fieldset className="border-t border-slate-200 py-6">
-        <legend className="text-lg font-bold text-slate-900">Mon niveau de français est</legend>
+        <legend className="text-lg font-bold text-slate-900">Je m’inscris pour le niveau</legend>
         <div className="mt-4 grid gap-x-6 gap-y-3 sm:grid-cols-2">
           {levels.map((level) => (
-            <label key={level} className="flex min-h-8 items-center gap-3 text-sm leading-6 text-slate-700">
-              <input type="radio" name="french_level" value={level} required className="h-4 w-4 accent-red-600" />
-              <span>{level}</span>
+            <label key={level.value} className="flex min-h-8 items-center gap-3 text-sm leading-6 text-slate-700">
+              <input type="radio" name="french_level" value={level.value} required className="h-4 w-4 accent-red-600" />
+              <span>{level.label}</span>
             </label>
           ))}
         </div>
@@ -228,18 +289,6 @@ export default function ReservationFlow({
           Je ne connais pas mon niveau ?! Cliquez ici :-)
         </Link>
       </fieldset>
-
-      <label className="block border-t border-slate-200 py-6 text-sm font-semibold text-slate-800">
-        Je suis intéressé(e) par
-        <input
-          name="offre"
-          defaultValue={selectedOffer}
-          readOnly={Boolean(selectedOffer)}
-          required
-          placeholder="Offre de cours"
-          className={inputClassName}
-        />
-      </label>
 
       {offerType === "group" && (
         <fieldset className="border-t border-slate-200 py-6">
@@ -291,10 +340,19 @@ export default function ReservationFlow({
         </fieldset>
       )}
 
-      {showSchedule && <AvailabilityPicker />}
+      {showSchedule && availabilityStatus === "loading" && <p role="status" className="border-t border-slate-200 py-6 text-sm text-slate-600">Chargement des disponibilités…</p>}
+      {showSchedule && availabilityStatus === "error" && <p role="alert" className="border-t border-slate-200 py-6 text-sm text-red-700">Impossible de charger les disponibilités. Vérifiez que la migration Supabase du planning est appliquée et que des créneaux sont ouverts dans Admin &gt; Planning, puis rechargez le formulaire.</p>}
+      {showSchedule && availabilityStatus === "ready" && availableSlots.length === 0 && <p role="status" className="border-t border-slate-200 py-6 text-sm text-slate-600">Aucun créneau n’est actuellement disponible. Revenez un peu plus tard.</p>}
+      {showSchedule && availabilityStatus === "ready" && availableSlots.length > 0 && (
+        <AvailabilityPicker
+          availableSlots={availableSlots}
+          selectedSlots={selectedAvailabilitySlots}
+          onToggle={(slot) => setSelectedAvailabilitySlots((current) => current.includes(slot) ? current.filter((item) => item !== slot) : [...current, slot])}
+        />
+      )}
 
       <label className="block border-t border-slate-200 py-6 text-sm font-semibold text-slate-800">
-        Si vous voulez, vous pouvez poser ici une question ou un commentaire :
+        Si vous voulez, vous pouvez poster ici une question ou un commentaire :
         <textarea name="comment" rows={5} className={inputClassName} />
       </label>
 

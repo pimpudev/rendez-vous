@@ -32,12 +32,11 @@ export default async function ReservationPage({
         </header>
 
         <section className="mx-auto max-w-4xl px-2 pb-10 pt-14 text-center sm:pt-16">
-          <h1 className="text-4xl font-black tracking-tight text-slate-900 sm:text-5xl">Formulaire</h1>
+          <h1 className="text-4xl font-black tracking-tight text-slate-900 sm:text-5xl">
+            {selectedOffer || (offerType === "individual" ? "Cours individuel" : "Cours groupe")}
+          </h1>
           <p className="mx-auto mt-5 max-w-3xl text-lg leading-8 text-slate-600">
-            Vous êtes à quelques clics de prendre Rendez-Vous.
-          </p>
-          <p className="mx-auto mt-3 max-w-3xl text-base leading-7 text-slate-600">
-            Pour réserver un cours, veuillez compléter ce formulaire. POUR CHAQUE QUESTION À CHOIX MULTIPLE, VOUS POUVEZ COCHER AUTANT D’OPTIONS QUE VOUS VOULEZ.
+            Vous êtes juste à quelques clics de prendre Rendez-Vous.
           </p>
         </section>
 
