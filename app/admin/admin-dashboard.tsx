@@ -39,6 +39,7 @@ type FollowedCourse = {
   offer: string;
   offer_details: string;
   availability_slots: string[];
+  scheduled_slot: string | null;
   selected_group_id: string | null;
   comment: string;
   created_at: string;
@@ -119,7 +120,7 @@ async function loadAdminReservations(
 
   const { data: followedCourses, error: coursesError } = await supabase
     .from("student_courses")
-    .select("id, student_email, first_name, last_name, course_type, offer, offer_details, availability_slots, selected_group_id, comment, created_at")
+      .select("id, student_email, first_name, last_name, course_type, offer, offer_details, availability_slots, scheduled_slot, selected_group_id, comment, created_at")
     .order("created_at", { ascending: false });
 
   if (coursesError) {
@@ -222,6 +223,7 @@ export default function AdminDashboard() {
     getSupabaseClient() ? [] : [demoIndividualReservation, demoReservation],
   );
   const [followedCourses, setFollowedCourses] = useState<FollowedCourse[]>([]);
+  const [selectedFinalSlots, setSelectedFinalSlots] = useState<Record<string, string>>({});
   const [studentNotes, setStudentNotes] = useState<Record<string, string>>({});
   const [savedStudentNotes, setSavedStudentNotes] = useState<Record<string, string>>({});
   const [loginError, setLoginError] = useState("");
@@ -360,8 +362,17 @@ export default function AdminDashboard() {
   }
 
   async function finalizeRegistration(student: StudentRow, registration: Reservation) {
+    const scheduledSlot = registration.registration_type === 1
+      ? selectedFinalSlots[registration.id] ?? (registration.availability_slots.length === 1 ? registration.availability_slots[0] : "")
+      : "";
+
+    if (registration.registration_type === 1 && !scheduledSlot) {
+      setSaveError("Choisissez le créneau individuel à réserver avant de finaliser l’inscription.");
+      return;
+    }
+
     const confirmed = window.confirm(
-      `Finaliser l’inscription de ${student.first_name} ${student.last_name} à « ${registration.offer} » ? La demande sera retirée et l’offre ajoutée aux offres suivies.`,
+      `Finaliser l’inscription de ${student.first_name} ${student.last_name} à « ${registration.offer} »${scheduledSlot ? ` pour le créneau ${scheduledSlot}` : ""} ? La demande sera retirée et l’offre ajoutée aux offres suivies.`,
     );
     if (!confirmed) return;
 
@@ -375,6 +386,7 @@ export default function AdminDashboard() {
         offer: registration.offer,
         offer_details: registration.offer_details,
         availability_slots: registration.availability_slots,
+        scheduled_slot: scheduledSlot || null,
         selected_group_id: registration.selected_group_id,
         comment: registration.comment,
         created_at: new Date().toISOString(),
@@ -389,7 +401,10 @@ export default function AdminDashboard() {
 
     setSavingId(registration.id);
     setSaveError("");
-    const { data, error } = await supabase.rpc("finalize_reservation", { p_reservation_id: registration.id });
+    const { error } = await supabase.rpc("finalize_reservation", {
+      p_reservation_id: registration.id,
+      p_scheduled_slot: scheduledSlot || null,
+    });
     setSavingId(null);
 
     if (error) {
@@ -599,6 +614,21 @@ export default function AdminDashboard() {
                               <p className="mt-1 whitespace-pre-wrap text-sm font-medium text-slate-800">{registration.comment}</p>
                             </div>
                           )}
+                          {registration.registration_type === 1 && (
+                            <label className="mb-3 block text-xs font-semibold text-slate-600">
+                              Créneau individuel à réserver
+                              <select
+                                aria-label={`Créneau individuel à réserver pour ${registration.offer} de ${student.first_name} ${student.last_name}`}
+                                value={selectedFinalSlots[registration.id] ?? (registration.availability_slots.length === 1 ? registration.availability_slots[0] : "")}
+                                disabled={isSaving}
+                                onChange={(event) => setSelectedFinalSlots((current) => ({ ...current, [registration.id]: event.target.value }))}
+                                className={`${selectClassName} mt-1`}
+                              >
+                                <option value="">Choisir un créneau</option>
+                                {registration.availability_slots.map((slot) => <option key={slot} value={slot}>{slot}</option>)}
+                              </select>
+                            </label>
+                          )}
                           <label className="block text-xs font-semibold text-slate-600">
                             Statut de la demande
                             <select
@@ -614,16 +644,14 @@ export default function AdminDashboard() {
                             </select>
                           </label>
                           <div className="mt-3 grid gap-2">
-                            {(
-                              <button
-                                type="button"
-                                disabled={isSaving}
-                                onClick={() => void finalizeRegistration(student, registration)}
-                                className="min-h-10 rounded-lg bg-emerald-600 px-3 py-2 text-xs font-bold text-white transition hover:bg-emerald-700 disabled:cursor-wait disabled:opacity-50"
-                              >
-                                Finaliser l’inscription
-                              </button>
-                            )}
+                            <button
+                              type="button"
+                              disabled={isSaving || (registration.registration_type === 1 && !(selectedFinalSlots[registration.id] ?? (registration.availability_slots.length === 1 ? registration.availability_slots[0] : "")))}
+                              onClick={() => void finalizeRegistration(student, registration)}
+                              className="min-h-10 rounded-lg bg-emerald-600 px-3 py-2 text-xs font-bold text-white transition hover:bg-emerald-700 disabled:cursor-wait disabled:opacity-50"
+                            >
+                              Finaliser l’inscription
+                            </button>
                             <button
                               type="button"
                               disabled={isSaving}
@@ -644,7 +672,9 @@ export default function AdminDashboard() {
                         <div key={course.id} className="border-b border-slate-200 pb-3 last:border-0 last:pb-0">
                           <p className="font-semibold text-slate-900">{course.offer} · {course.course_type === "individual" ? "Individuel" : "Groupe"}</p>
                           <p className="mt-1 text-sm leading-6 text-slate-600">
-                            {course.availability_slots.length > 0
+                            {course.scheduled_slot
+                              ? course.scheduled_slot
+                              : course.availability_slots.length > 0
                               ? course.availability_slots.join(" · ")
                               : course.offer_details || "Créneau à préciser"}
                           </p>

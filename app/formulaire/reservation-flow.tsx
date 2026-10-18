@@ -34,7 +34,7 @@ const hourlySlots = Array.from({ length: 10 }, (_, index) => {
 const inputClassName =
   "mt-2 min-h-12 w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-200";
 
-function AvailabilityPicker({ availableSlots, selectedSlots, onToggle }: { availableSlots: string[]; selectedSlots: string[]; onToggle: (slot: string) => void }) {
+function AvailabilityPicker({ availableSlots, selectedSlots, onToggle, helpText }: { availableSlots: string[]; selectedSlots: string[]; onToggle: (slot: string) => void; helpText: string }) {
   return (
     <fieldset className="border-t border-slate-200 py-6">
       <legend className="text-lg font-bold text-slate-900">Je suis disponible :</legend>
@@ -52,11 +52,11 @@ function AvailabilityPicker({ availableSlots, selectedSlots, onToggle }: { avail
                 <th scope="row" className="whitespace-nowrap px-2 py-1 text-left font-medium text-slate-600">{start} h</th>
                 {weekdays.map((day) => {
                   const slot = `${day} ${value}`;
-                  const available = availableSlots.includes(slot);
+                  const selectable = availableSlots.includes(slot);
                   const selected = selectedSlots.includes(slot);
                   return (
                     <td key={slot} className="p-0">
-                      {available ? (
+                      {selectable ? (
                         <button
                           type="button"
                           aria-label={`${selected ? "Retirer" : "Choisir"} ${day}, ${value}`}
@@ -78,7 +78,7 @@ function AvailabilityPicker({ availableSlots, selectedSlots, onToggle }: { avail
           </tbody>
         </table>
       </div>
-      <p className="mt-2 text-sm text-slate-600">Vous pouvez sélectionner autant de jours / heures que vous souhaitez.</p>
+      <p className="mt-2 text-sm text-slate-600">{helpText}</p>
       {selectedSlots.map((slot) => <input key={slot} type="hidden" name="availability_slots[]" value={slot} />)}
     </fieldset>
   );
@@ -115,22 +115,30 @@ export default function ReservationFlow({
     if (!supabase) return;
 
     let isActive = true;
-    void supabase
-      .from("course_groups")
-      .select("id, offer, group_name, schedule_description")
-      .eq("offer", selectedOffer)
-      .eq("is_open", true)
-      .order("created_at", { ascending: true })
-      .then(({ data, error }) => {
+    const loadGroups = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("course_groups")
+          .select("id, offer, group_name, schedule_description")
+          .eq("offer", selectedOffer)
+          .eq("is_open", true)
+          .order("created_at", { ascending: true })
+          .abortSignal(AbortSignal.timeout(10000));
         if (!isActive) return;
         if (error) {
-          setGroupLoadError("Impossible de charger les groupes ouverts. Vérifiez que la migration Supabase des formulaires étudiants a été exécutée, puis réessayez.");
+          setGroupLoadError("Impossible de charger les groupes ouverts. Vous pouvez quand même proposer une demande de groupe avec vos disponibilités, ou réessayer.");
           setGroupsStatus("error");
           return;
         }
         setGroups((data ?? []) as OpenGroup[]);
         setGroupsStatus("ready");
-      });
+      } catch {
+        if (!isActive) return;
+        setGroupLoadError("La recherche des groupes a expiré. Vous pouvez proposer une demande de groupe avec vos disponibilités, ou réessayer.");
+        setGroupsStatus("error");
+      }
+    };
+    void loadGroups();
 
     return () => {
       isActive = false;
@@ -143,7 +151,9 @@ export default function ReservationFlow({
 
     let isActive = true;
     const loadAvailability = async () => {
-      const { data, error } = await supabase.from("teacher_availability_slots").select("slot");
+      const { data, error } = await supabase
+        .from("teacher_availability_slots")
+        .select("slot");
       if (!isActive) return;
       if (error) {
         setAvailabilityStatus("error");
@@ -168,14 +178,14 @@ export default function ReservationFlow({
       isActive = false;
       void supabase.removeChannel(channel);
     };
-  }, []);
+  }, [offerType]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
     if (!form.reportValidity()) return;
 
-    if (offerType === "group" && groupsStatus !== "ready") {
+    if (offerType === "group" && groupsStatus === "loading") {
       setErrorMessage("Attendez le chargement des groupes avant d’envoyer le formulaire.");
       return;
     }
@@ -256,7 +266,9 @@ export default function ReservationFlow({
   }
 
   const declinedAllGroups = groups.length > 0 && groups.every((group) => declinedGroupIds.includes(group.id));
-  const showSchedule = offerType === "individual" || (groupsStatus === "ready" && (groups.length === 0 || declinedAllGroups));
+  const showSchedule = offerType === "individual"
+    || (groupsStatus === "ready" && (groups.length === 0 || declinedAllGroups))
+    || (offerType === "group" && groupsStatus === "error");
 
   return (
     <form onSubmit={handleSubmit} className="mx-auto mb-16 max-w-4xl rounded-2xl border border-slate-200 bg-white px-6 py-2 shadow-sm sm:px-10">
@@ -342,11 +354,14 @@ export default function ReservationFlow({
 
       {showSchedule && availabilityStatus === "loading" && <p role="status" className="border-t border-slate-200 py-6 text-sm text-slate-600">Chargement des disponibilités…</p>}
       {showSchedule && availabilityStatus === "error" && <p role="alert" className="border-t border-slate-200 py-6 text-sm text-red-700">Impossible de charger les disponibilités. Vérifiez que la migration Supabase du planning est appliquée et que des créneaux sont ouverts dans Admin &gt; Planning, puis rechargez le formulaire.</p>}
-      {showSchedule && availabilityStatus === "ready" && availableSlots.length === 0 && <p role="status" className="border-t border-slate-200 py-6 text-sm text-slate-600">Aucun créneau n’est actuellement disponible. Revenez un peu plus tard.</p>}
-      {showSchedule && availabilityStatus === "ready" && availableSlots.length > 0 && (
+      {showSchedule && offerType === "individual" && availabilityStatus === "ready" && availableSlots.length === 0 && <p role="status" className="border-t border-slate-200 py-6 text-sm text-slate-600">Aucun créneau n’est actuellement disponible. Revenez un peu plus tard.</p>}
+      {showSchedule && availabilityStatus === "ready" && (availableSlots.length > 0 || offerType === "group") && (
         <AvailabilityPicker
           availableSlots={availableSlots}
           selectedSlots={selectedAvailabilitySlots}
+          helpText={offerType === "group"
+            ? "Pour une demande de création de groupe, choisissez uniquement parmi les créneaux ouverts dans le planning."
+            : "Vous pouvez sélectionner autant de jours / heures que vous souhaitez."}
           onToggle={(slot) => setSelectedAvailabilitySlots((current) => current.includes(slot) ? current.filter((item) => item !== slot) : [...current, slot])}
         />
       )}
@@ -360,7 +375,7 @@ export default function ReservationFlow({
         {errorMessage && <p role="alert" className="mb-4 text-sm font-semibold text-red-700">{errorMessage}</p>}
         <button
           type="submit"
-          disabled={isSubmitting || (offerType === "group" && groupsStatus !== "ready")}
+          disabled={isSubmitting || (offerType === "group" && groupsStatus === "loading")}
           className="inline-flex min-h-14 items-center justify-center rounded-full bg-red-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-red-200 transition hover:bg-red-500 disabled:cursor-wait disabled:opacity-60"
         >
           {isSubmitting ? "Envoi en cours…" : "Envoyer le formulaire"}

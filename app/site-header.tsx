@@ -2,7 +2,7 @@ import Link from "next/link";
 import ThemeToggle from "./theme-toggle";
 import { LanguageSelector } from "./site-language";
 
-export default function SiteHeader() {
+export default function SiteHeader({ showLanguageSelector = true }: { showLanguageSelector?: boolean }) {
   return (
     <header className="mx-auto max-w-6xl px-3 py-6 sm:px-6 lg:px-8">
       <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-2 rounded-full bg-white px-2 py-3 shadow-sm sm:px-4">
@@ -16,9 +16,11 @@ export default function SiteHeader() {
         >
           Rendez-Vous
         </Link>
-        <div className="col-start-3 row-start-1 justify-self-end">
-          <LanguageSelector />
-        </div>
+        {showLanguageSelector && (
+          <div className="col-start-3 row-start-1 justify-self-end">
+            <LanguageSelector />
+          </div>
+        )}
       </div>
     </header>
   );

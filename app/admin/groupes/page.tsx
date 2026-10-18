@@ -1,5 +1,6 @@
 import Link from "next/link";
 import AdminHeader from "../admin-header";
+import GroupsDashboard from "./groups-dashboard";
 
 export default function GroupsAdminPage() {
   return (
@@ -8,7 +9,7 @@ export default function GroupsAdminPage() {
         <AdminHeader />
         <section className="mx-auto max-w-4xl pb-20 pt-16">
           <h1 className="text-center text-3xl font-black tracking-tight sm:text-4xl"><span className="text-red-600">ADMIN</span><span className="text-red-600"> - Groupes</span></h1>
-          <p className="mt-5 max-w-2xl leading-7 text-slate-600">La gestion des groupes et de leurs créneaux sera disponible ici.</p>
+          <GroupsDashboard />
           <Link href="/admin" className="mt-8 inline-flex font-semibold text-red-700 underline decoration-red-300 underline-offset-4">Retour aux sections</Link>
         </section>
       </div>
