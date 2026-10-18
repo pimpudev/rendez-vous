@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import ThemeToggle from "../../theme-toggle";
-import { LanguageSelector } from "../../site-language";
+import SiteHeader from "../../site-header";
+import { fetchPublishedOffers } from "../../../lib/course-offers";
 
-const offers = {
+const legacyOffers = {
   "individuel-professionnel": {
     category: "INDIVIDUEL",
     name: "Professionnel – 1 à 4 compétences",
@@ -70,19 +70,26 @@ const offers = {
   },
 } as const;
 
-type OfferSlug = keyof typeof offers;
-
-export function generateStaticParams() {
-  return Object.keys(offers).map((slug) => ({ slug }));
-}
-
 export default async function OfferPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const offer = offers[slug as OfferSlug];
+  const { offers: publishedOffers } = await fetchPublishedOffers();
+  const publishedOffer = publishedOffers?.find((item) => item.slug === slug);
+  const legacyOffer = legacyOffers[slug as keyof typeof legacyOffers];
+  const offer = publishedOffers === null
+    ? legacyOffer
+    : publishedOffer
+      ? {
+        category: publishedOffer.category === "individual" ? "INDIVIDUEL" : "GROUPE",
+        name: publishedOffer.name_fr,
+        description: publishedOffer.description_fr,
+        price: `${new Intl.NumberFormat("fr-FR", { style: "currency", currency: "INR", maximumFractionDigits: 2 }).format(publishedOffer.price_inr)} = ${new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR", maximumFractionDigits: 2 }).format(publishedOffer.price_eur)} / heure${publishedOffer.category === "group" ? " / étudiant" : ""}`,
+        limits: publishedOffer.requirements,
+      }
+      : undefined;
 
   if (!offer) {
     notFound();
@@ -91,20 +98,7 @@ export default async function OfferPage({
   return (
     <main className="site-shell min-h-screen bg-[linear-gradient(180deg,_#EAF3F8_0%,_#DDECF5_45%,_#C9DDEA_100%)] px-6 py-8 text-slate-800 lg:px-8">
       <div className="mx-auto max-w-6xl">
-        <header className="flex flex-wrap items-center justify-between gap-3 rounded-full bg-white px-4 py-3 shadow-sm sm:px-5">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="font-bold text-slate-900 transition hover:text-red-600">
-              Rendez-Vous
-            </Link>
-            <ThemeToggle />
-          </div>
-          <div className="ml-auto flex items-center gap-2">
-            <LanguageSelector />
-            <Link href="/#programs" className="text-sm font-semibold text-slate-700 transition hover:text-red-600">
-              Toutes les offres
-            </Link>
-          </div>
-        </header>
+        <SiteHeader />
 
         <section className="mx-auto max-w-5xl px-2 pb-14 pt-16 text-center sm:pt-20">
           <p className="text-sm font-bold uppercase tracking-[0.2em] text-red-600">{offer.category}</p>

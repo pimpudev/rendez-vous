@@ -2,8 +2,9 @@
 
 import { useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
-import ThemeToggle from "./theme-toggle";
-import { LanguageSelector, useSiteLanguage, type SiteLanguage } from "./site-language";
+import SiteHeader from "./site-header";
+import { useSiteLanguage, type SiteLanguage } from "./site-language";
+import { fetchPublishedOffers, type CourseOffer } from "../lib/course-offers";
 
 const content = {
   fr: {
@@ -235,6 +236,14 @@ const offerPrices = {
 } as const;
 
 type Currency = "INR" | "EUR";
+type HomeOffer = {
+  slug: string;
+  category: "individual" | "group";
+  name: string;
+  price_inr: number;
+  price_eur: number;
+};
+
 const introStorageKey = "rendez-vous-intro-seen";
 const introListeners = new Set<() => void>();
 
@@ -268,20 +277,20 @@ function rememberIntroSeen() {
   introListeners.forEach((listener) => listener());
 }
 
-function formatOfferPrice(slug: string, currency: Currency, language: SiteLanguage) {
-  const price = offerPrices[slug as keyof typeof offerPrices];
-  const amount = currency === "INR" ? price.inr : price.eur;
+function formatOfferPrice(offer: HomeOffer, currency: Currency, language: SiteLanguage) {
+  const amount = currency === "INR" ? offer.price_inr : offer.price_eur;
+  const perStudent = offer.category === "group";
   const locale = language === "fr" ? "fr-FR" : language === "en" ? "en-IN" : "es-ES";
   const formattedAmount = new Intl.NumberFormat(locale, {
     style: "currency",
     currency,
-    maximumFractionDigits: 0,
+    maximumFractionDigits: 2,
   }).format(amount);
   const unit = language === "fr"
-    ? price.perStudent ? " / heure / étudiant" : " / heure"
+    ? perStudent ? " / heure / étudiant" : " / heure"
     : language === "en"
-      ? price.perStudent ? " / hour / student" : " / hour"
-      : price.perStudent ? " / hora / estudiante" : " / hora";
+      ? perStudent ? " / hour / student" : " / hour"
+      : perStudent ? " / hora / estudiante" : " / hora";
 
   return `${formattedAmount}${unit}`;
 }
@@ -321,18 +330,49 @@ export default function Home() {
   const introVisible = !introSeen;
   const [introLeaving, setIntroLeaving] = useState(false);
   const [currency, setCurrency] = useState<Currency>("INR");
+  const [publishedOffers, setPublishedOffers] = useState<CourseOffer[] | null>(null);
   const t = content[lang];
-  const orderedOfferBlocks = [...t.offerBlocks]
+  const homeOffers: HomeOffer[] = publishedOffers === null
+    ? t.offerBlocks.flatMap((block) => block.items.map((offer) => {
+      const price = offerPrices[offer.slug as keyof typeof offerPrices];
+      return {
+        slug: offer.slug,
+        category: offer.slug.startsWith("groupe-") ? "group" : "individual",
+        name: offer.name,
+        price_inr: price.inr,
+        price_eur: price.eur,
+      };
+    }))
+    : publishedOffers.map((offer) => ({
+      slug: offer.slug,
+      category: offer.category,
+      name: lang === "fr" ? offer.name_fr : lang === "en" ? offer.name_en || offer.name_fr : offer.name_es || offer.name_fr,
+      price_inr: offer.price_inr,
+      price_eur: offer.price_eur,
+    }));
+  const orderedOfferBlocks = (["group", "individual"] as const).map((category) => ({
+    title: t.offerBlocks.find((block) => block.items.some((offer) => offer.slug.startsWith(category === "group" ? "groupe-" : "individuel-")))?.title ?? category.toUpperCase(),
+    items: homeOffers.filter((offer) => offer.category === category),
+  })).filter((block) => block.items.length > 0)
     .map((block) => ({
       ...block,
-      items: [...block.items].sort((first, second) =>
-        offerPrices[first.slug as keyof typeof offerPrices].inr - offerPrices[second.slug as keyof typeof offerPrices].inr,
-      ),
+      items: [...block.items].sort((first, second) => first.price_inr - second.price_inr),
     }))
     .sort((first, second) =>
-      Math.min(...first.items.map((offer) => offerPrices[offer.slug as keyof typeof offerPrices].inr))
-      - Math.min(...second.items.map((offer) => offerPrices[offer.slug as keyof typeof offerPrices].inr)),
+      Math.min(...first.items.map((offer) => offer.price_inr))
+      - Math.min(...second.items.map((offer) => offer.price_inr)),
     );
+
+  useEffect(() => {
+    let isActive = true;
+    void fetchPublishedOffers().then(({ offers }) => {
+      if (isActive && offers !== null) setPublishedOffers(offers);
+    });
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (!introVisible) return;
@@ -362,19 +402,9 @@ export default function Home() {
           </div>
         </div>
       )}
-      <header inert={introVisible} aria-hidden={introVisible} className="mx-auto max-w-6xl px-6 py-6 lg:px-8">
-        <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-y-2 rounded-full bg-white px-3 py-3 shadow-sm sm:gap-y-0 sm:px-4">
-          <div className="col-start-1 row-start-1 justify-self-start">
-            <ThemeToggle />
-          </div>
-          <Link href="#programs" className="col-span-3 row-start-2 justify-self-center whitespace-nowrap rounded-full bg-slate-900 px-2 py-2 text-[11px] font-medium text-white transition hover:bg-slate-700 sm:col-span-1 sm:col-start-2 sm:row-start-1 sm:px-4 sm:text-sm">
-            {t.primaryCta}
-          </Link>
-          <div className="col-start-3 row-start-1 justify-self-end">
-            <LanguageSelector />
-          </div>
-        </div>
-      </header>
+      <div inert={introVisible} aria-hidden={introVisible}>
+        <SiteHeader />
+      </div>
 
       <main inert={introVisible} aria-hidden={introVisible}>
         <section className="mx-auto max-w-6xl px-6 pb-16 pt-8 lg:px-8 lg:pb-24">
@@ -505,7 +535,7 @@ export default function Home() {
                   {block.items.map((offer) => (
                     <Link key={offer.slug} href={`/offres/${offer.slug}`} className="group flex min-h-[300px] flex-col rounded-lg border border-slate-200 bg-white px-6 py-7 transition-colors hover:border-slate-300 hover:bg-slate-50 focus-visible:relative focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-red-600">
                         <h4 className="min-h-[4.5rem] text-lg font-bold leading-6 text-slate-900">{offer.name}</h4>
-                        <p className="mt-5 text-sm font-normal leading-6 text-slate-600">{formatOfferPrice(offer.slug, currency, lang)}</p>
+                        <p className="mt-5 text-sm font-normal leading-6 text-slate-600">{formatOfferPrice(offer, currency, lang)}</p>
                         <span className="mt-auto inline-flex min-h-10 items-center justify-center rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition-colors group-hover:bg-red-600">
                           {t.offerLinkLabel}
                         </span>
